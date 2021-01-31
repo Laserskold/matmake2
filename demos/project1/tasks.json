@@ -1,18 +1,24 @@
 ﻿[
   {
-    "in": "src/precompiled.h",
+    "out": "src/main.cpp"
+  },
+  {
+    "out": "data/Readme.md"
+  },
+  {
+    "out": "src/precompiled.hpp",
     "content": "#include <iostream>\n#include<vector>\n"
   },
   {
     "in": "data/Readme.md",
-    "out": ".",
+    "out": "Readme.md",
     "command": "[copy]"
   },
   {
-    "src": "src/*.cpp",
-    "in": [ "@pch" ],
-    "depfile": "{name}.o.d",
-    "out": [ "{name}.o" ],
+    "src": "src/main.cpp",
+    "in": [ "src/precompiled.hpp", "src/main.cpp" ],
+    "depfile": "main.o.d",
+    "out": "main.o",
     "command": "[compile]"
   },
   {
@@ -21,6 +27,7 @@
     "out": "main.exe",
     "dir": "build",
     "flags": "-Wall",
+    "type": "exe",
     "includes": [
       "include"
     ],
@@ -38,10 +45,10 @@
   },
   {
     "name": "g++",
-    "in": [ "@main" ],
+    "in": [ "@all" ],
     "compiler": "g++",
     "commands": {
-      "compile": "g++ {in} -o {out} {cxxflags} {flags} {includes}",
+      "compile": "g++ {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}",
       "link": "g++ {in} -o {out} {ldflags} {includes}"
     }
   }
