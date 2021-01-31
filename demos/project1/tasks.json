@@ -1,0 +1,48 @@
+﻿[
+  {
+    "in": "src/precompiled.h",
+    "content": "#include <iostream>\n#include<vector>\n"
+  },
+  {
+    "in": "data/Readme.md",
+    "out": ".",
+    "command": "[copy]"
+  },
+  {
+    "src": "src/*.cpp",
+    "in": [ "@pch" ],
+    "depfile": "{name}.o.d",
+    "out": [ "{name}.o" ],
+    "command": "[compile]"
+  },
+  {
+    "name": "main",
+    "in": [ "main.o" ],
+    "out": "main.exe",
+    "dir": "build",
+    "flags": "-Wall",
+    "includes": [
+      "include"
+    ],
+    "sysincludes": [
+      "bla"
+    ],
+    "command": "[link]"
+  },
+  {
+    "name": "all",
+    "in": [ "@main" ],
+    "config": [
+      "c++17"
+    ]
+  },
+  {
+    "name": "g++",
+    "in": [ "@main" ],
+    "compiler": "g++",
+    "commands": {
+      "compile": "g++ {in} -o {out} {cxxflags} {flags} {includes}",
+      "link": "g++ {in} -o {out} {ldflags} {includes}"
+    }
+  }
+]

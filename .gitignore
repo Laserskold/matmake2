@@ -1,0 +1,9 @@
+.matmake*
+.vs
+.vscode
+*.pro
+*.pro.user
+
+out/
+build/
+bin/
