@@ -58,17 +58,13 @@ std::unique_ptr<TaskList> parseTasks(std::filesystem::path path) {
     return list;
 }
 
-int main(int, char **) {
-    std::cout << "hello\n" << std::endl;
-
-    std::filesystem::current_path("demos/project1");
-    auto tasks = parseTasks("tasks.json");
-
-    for (auto &task : *tasks) {
+void printList(const TaskList &list) {
+    for (auto &task : list) {
         std::cout << "task: name = " << task.name() << "\n";
         std::cout << "  out = " << task.out() << "\n";
-        //        std::cout << "  src = " << task.src() << "\n";
-
+        if (task.parent()) {
+            std::cout << "  parent = " << task.parent()->out() << "\n";
+        }
         {
             auto &in = task.in();
             for (auto &i : in) {
@@ -76,6 +72,35 @@ int main(int, char **) {
             }
         }
     }
+}
+
+void printTree(const Task &root, size_t indentation = 0) {
+    auto indent = [indentation] {
+        for (size_t i = 0; i < indentation; ++i) {
+            std::cout << "  ";
+        }
+    };
+
+    indent();
+
+    std::cout << root.out() << "\n";
+
+    for (auto &in : root.in()) {
+        printTree(*in, indentation + 1);
+    }
+}
+
+int main(int, char **) {
+    std::cout << "hello\n" << std::endl;
+
+    std::filesystem::current_path("demos/project1");
+    auto tasks = parseTasks("tasks.json");
+
+    printList(*tasks);
+
+    std::cout << "\ntree\n";
+
+    printTree(*tasks->find("main.exe"));
 
     return 0;
 }

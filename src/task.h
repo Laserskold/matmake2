@@ -43,11 +43,28 @@ struct Task {
         }
         if (std::find(_in.begin(), _in.end(), in) == _in.end()) {
             _in.push_back(in);
+            in->parent(this);
         }
     }
 
     auto &in() {
         return _in;
+    }
+
+    auto &in() const {
+        return _in;
+    }
+
+    void parent(Task *parent) {
+        _parent = parent;
+    }
+
+    auto parent() {
+        return _parent;
+    }
+
+    auto parent() const {
+        return _parent;
     }
 
 private:
@@ -58,8 +75,9 @@ private:
     std::string _name; // If empty-same as out
 
     size_t waiting = 0;
-    std::vector<Task *> _in;
-    //    std::vector<Task *> triggers; // This might not be needed
+    std::vector<Task *> _in; // Files that needs to be built before this file
+    std::vector<filesystem::path>
+        triggers; // Files that mark this task as dirty
 
     std::vector<Task *> subscribers;
 

@@ -51,4 +51,12 @@ struct TaskList {
     auto end() {
         return _tasks.end();
     }
+
+    auto begin() const {
+        return _tasks.begin();
+    }
+
+    auto end() const {
+        return _tasks.end();
+    }
 };
