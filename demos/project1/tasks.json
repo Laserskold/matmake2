@@ -3,11 +3,18 @@
     "out": "src/main.cpp"
   },
   {
+    "out": "src/other.cpp"
+  },
+  {
     "out": "data/Readme.md"
   },
   {
-    "out": "src/precompiled.hpp",
-    "content": "#include <iostream>\n#include<vector>\n"
+    "out": "src/precompiled.hpp"
+  },
+  {
+    "out": "src/precompiled.hpp.pch",
+    "in": "src/precompiled.hpp",
+    "command": "[pch]"
   },
   {
     "in": "data/Readme.md",
@@ -16,14 +23,21 @@
   },
   {
     "src": "src/main.cpp",
-    "in": [ "src/precompiled.hpp", "src/main.cpp" ],
+    "in": [ "src/precompiled.hpp.pch", "src/main.cpp" ],
     "depfile": "main.o.d",
     "out": "main.o",
     "command": "[compile]"
   },
   {
+    "src": "src/other.cpp",
+    "in": [ "src/precompiled.hpp.pch", "src/other.cpp" ],
+    "depfile": "other.o.d",
+    "out": "other.o",
+    "command": "[compile]"
+  },
+  {
     "name": "main",
-    "in": [ "main.o" ],
+    "in": [ "main.o", "other.o" ],
     "out": "main.exe",
     "dir": "build",
     "flags": "-Wall",
@@ -49,7 +63,8 @@
     "compiler": "g++",
     "commands": {
       "compile": "g++ {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}",
-      "link": "g++ {in} -o {out} {ldflags} {includes}"
+      "link": "g++ {in} -o {out} {ldflags} {includes}",
+      "pch": "g++ {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}"
     }
   }
 ]

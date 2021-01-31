@@ -39,11 +39,12 @@
   },
   {
     "name": "g++",
-    "in": [ "@main" ],
+    "in": [ "@all" ],
     "compiler": "g++",
     "commands": {
-      "compile": "g++ {in} -o {out} {cxxflags} {flags} {includes}",
+      "compile": "g++ {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}",
       "link": "g++ {in} -o {out} {ldflags} {includes}"
+      "compile": "g++ {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}",
     }
   }
 ]
