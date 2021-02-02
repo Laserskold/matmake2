@@ -197,6 +197,13 @@ struct Task {
         }
     }
 
+    void parse(const class Json &jtask);
+
+    Json dump();
+
+    //! Print tree view from node
+    void print(size_t indentation = 0);
+
 private:
     Task *_parent = nullptr;
     filesystem::path _src;
@@ -217,7 +224,7 @@ private:
     std::map<std::string, std::string> _commands; // Parents build command
 };
 
-std::string ProcessedCommand::expandCommand(const Task &task) {
+inline std::string ProcessedCommand::expandCommand(const Task &task) {
     std::ostringstream ss;
 
     for (auto s : segments) {

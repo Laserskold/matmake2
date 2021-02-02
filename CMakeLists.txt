@@ -8,8 +8,9 @@ project ("matmake2")
 # Add source to this project's executable.
 add_executable (
 	matmake2
-	"src/main.cpp"
-	"src/precompiled.h"
+        "src/main.cpp"
+        "src/task.cpp"
+        "src/precompiled.h"
 	"src/targetnode.h"
 	"src/task.h"
 )
