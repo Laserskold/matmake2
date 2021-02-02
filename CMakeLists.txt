@@ -11,6 +11,7 @@ add_executable (
         "src/main.cpp"
         "src/task.cpp"
         "src/tasklist.cpp"
+        "src/nativecommands.cpp"
         "src/precompiled.h"
 	"src/targetnode.h"
 	"src/task.h"

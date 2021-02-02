@@ -84,10 +84,6 @@ struct Task {
         }
     }
 
-    //    auto &in() {
-    //        return _in;
-    //    }
-
     auto &in() const {
         return _in;
     }
@@ -205,10 +201,12 @@ struct Task {
         else if (_parent) {
             return _parent->commandAt(name);
         }
-        else {
-            throw std::runtime_error{"could not find " + name + " on target " +
-                                     this->name()};
-        }
+        return name;
+        //        else {
+        //            throw std::runtime_error{"could not find " + name + " on
+        //            target " +
+        //                                     this->name()};
+        //        }
     }
 
     void cxx(filesystem::path cxx) {
