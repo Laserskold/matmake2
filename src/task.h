@@ -1,52 +1,13 @@
 ﻿#pragma once
 
 #include "filesystem.h"
+#include "processedcommand.h"
 #include <algorithm>
 #include <chrono>
 #include <map>
 #include <sstream>
 #include <string>
 #include <vector>
-
-class ProcessedCommand {
-public:
-    ProcessedCommand(std::string command) {
-        auto f = size_t{0};
-        auto old = size_t{0};
-
-        while ((f = command.find('{', old)) != std::string::npos) {
-            segments.push_back({
-                .value = command.substr(old, f - old),
-                .isReference = false,
-            });
-
-            if ((old = command.find('}', f)) != std::string::npos) {
-                segments.push_back({
-                    .value = command.substr(f + 1, old - f - 1),
-                    .isReference = true,
-                });
-                ++old;
-            }
-            else {
-                break;
-            }
-        }
-    }
-    ProcessedCommand(const ProcessedCommand &) = default;
-    ProcessedCommand(ProcessedCommand &&) = default;
-    ProcessedCommand &operator=(const ProcessedCommand &) = default;
-    ProcessedCommand &operator=(ProcessedCommand &&) = default;
-
-    std::string expandCommand(const struct Task &task);
-
-private:
-    struct Segment {
-        std::string value;
-        bool isReference = false;
-    };
-
-    std::vector<Segment> segments;
-};
 
 struct Task {
     using TimePoint = filesystem::file_time_type;
@@ -72,10 +33,6 @@ struct Task {
     void name(std::string value) {
         _name = std::move(value);
     }
-
-    //    filesystem::path src() const {
-    //        return _src;
-    //    }
 
     filesystem::path out() const {
         if (_out.empty()) {
@@ -121,10 +78,6 @@ struct Task {
         }
 
         std::string ret;
-
-        //        if (!_src.empty()) {
-        //            ret += _src.string() + " ";
-        //        }
 
         for (auto &in : _in) {
             ret += in->out().string() + " ";
@@ -267,7 +220,6 @@ struct Task {
 
 private:
     Task *_parent = nullptr;
-    //    filesystem::path _src;
     filesystem::path _out;
     filesystem::path _dir;
     filesystem::path _depfile;
@@ -285,18 +237,3 @@ private:
     std::vector<Task *> _subscribers;
     TimePoint _changedTime;
 };
-
-inline std::string ProcessedCommand::expandCommand(const Task &task) {
-    std::ostringstream ss;
-
-    for (auto s : segments) {
-        if (s.isReference) {
-            ss << task.property(s.value);
-        }
-        else {
-            ss << s.value;
-        }
-    }
-
-    return ss.str();
-}

@@ -30,6 +30,7 @@ int main(int, char **) {
     std::cout << "hello\n" << std::endl;
 
     filesystem::current_path("demos/project1");
+
     auto tasks = parseTasks("tasks.json");
 
     printFlat(*tasks);
