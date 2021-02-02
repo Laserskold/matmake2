@@ -86,24 +86,28 @@ void Task::print(bool verbose, size_t indentation) {
     indent();
     std::cout << name() << " " << out() << "\n";
 
-    try {
-        {
-            auto command = this->command();
-            indent();
-            std::cout << "command: "
-                      << ProcessedCommand{command}.expandCommand(*this) << "\n";
+    if (_state != TaskState::Raw) {
+        try {
+            {
+                auto command = this->command();
+                indent();
+                std::cout << "command: "
+                          << ProcessedCommand{command}.expand(*this) << "\n";
 
-            indent();
-            std::cout << "raw: " << command << "\n";
+                indent();
+                std::cout << "raw: " << command << "\n";
+            }
         }
-    }
-    catch (...) {
+        catch (...) {
+        }
     }
 
     indent() << "dir: " << dir() << "\n";
 
     indent() << "exists: " << (filesystem::exists(out()) ? "yes" : "no")
              << "\n";
+
+    indent() << "dirty: " << (isDirty() ? "yes" : "no") << "\n";
 
     if (verbose) {
         auto commands = this->commands();
@@ -119,9 +123,16 @@ void Task::print(bool verbose, size_t indentation) {
 
     if (!in().empty()) {
         indent() << "in:\n";
+        for (auto &in : in()) {
+            in->print(verbose, indentation + 1);
+        }
     }
-    for (auto &in : in()) {
-        in->print(verbose, indentation + 1);
+
+    if (!triggers().empty()) {
+        indent() << "in:\n";
+        for (auto &trigger : triggers()) {
+            trigger->print(verbose, indentation + 1);
+        }
     }
 
     indent() << " -- \n";

@@ -25,6 +25,24 @@ void connectTasks(TaskList &list, const Json &json) {
                 task.pushIn(list.find(f->value));
             }
         }
+
+        if (auto f = data.find("deps"); f != data.end()) {
+            if (f->type == Json::Array) {
+                for (auto &value : *f) {
+                    auto ftask = list.find(value.string());
+                    if (ftask) {
+                        task.pushTrigger(ftask);
+                    }
+                    else {
+                        throw std::runtime_error{"could not find task " +
+                                                 value.string()};
+                    }
+                }
+            }
+            else {
+                task.pushIn(list.find(f->value));
+            }
+        }
     }
 }
 
@@ -61,4 +79,21 @@ std::unique_ptr<TaskList> parseTasks(filesystem::path path) {
     calculateState(*list);
 
     return list;
+}
+
+void printFlat(const TaskList &list) {
+    for (auto &task : list) {
+        std::cout << "task: name = " << task.name() << "\n";
+        std::cout << "  out = " << task.out() << "\n";
+        if (task.parent()) {
+            std::cout << "  parent = " << task.parent()->out() << "\n";
+        }
+
+        {
+            auto &in = task.in();
+            for (auto &i : in) {
+                std::cout << "  in: " << i->out() << "\n";
+            }
+        }
+    }
 }

@@ -9,6 +9,14 @@
 #include <string>
 #include <vector>
 
+enum class TaskState {
+    NotCalculated,
+    Raw, // Input file: nothing to do
+    Fresh,
+    DirtyReady,
+    DirtyWaiting,
+};
+
 struct Task {
     using TimePoint = filesystem::file_time_type;
 
@@ -61,15 +69,31 @@ struct Task {
         if (std::find(_in.begin(), _in.end(), in) == _in.end()) {
             _in.push_back(in);
             in->parent(this);
+            in->addSubscriber(this);
         }
     }
 
-    auto &in() {
-        return _in;
+    void pushTrigger(Task *trigger) {
+        if (!trigger) {
+            return;
+        }
+        else if (std::find(_triggers.begin(), _triggers.end(), trigger) ==
+                 _triggers.end()) {
+            _triggers.push_back(trigger);
+            trigger->parent(this);
+        }
     }
+
+    //    auto &in() {
+    //        return _in;
+    //    }
 
     auto &in() const {
         return _in;
+    }
+
+    auto &triggers() const {
+        return _triggers;
     }
 
     std::string concatIn() const {
@@ -207,10 +231,68 @@ struct Task {
         return _changedTime;
     }
 
+    TaskState state() {
+        return _state;
+    }
+
+    bool isDirty() {
+        updateState();
+        return _state != TaskState::Fresh && _state != TaskState::Raw;
+    }
+
     void parse(const class Json &jtask);
 
+    void addSubscriber(Task *task) {
+        _subscribers.push_back(task);
+    }
+
+    void updateChangedTime() {
+        auto filename = out();
+        if (filesystem::exists(filename)) {
+            _changedTime = filesystem::last_write_time(filename);
+        }
+        else {
+            _changedTime = {};
+        }
+    }
+
     void updateState() {
-        _changedTime = filesystem::last_write_time(out());
+        if (_state != TaskState::NotCalculated) {
+            return;
+        }
+
+        updateChangedTime();
+
+        if (_in.empty()) {
+            if (_changedTime == TimePoint{}) {
+                throw std::runtime_error{"input file " + out().string() +
+                                         " not found"};
+            }
+            _state = TaskState::Raw;
+            return;
+        }
+
+        for (auto &in : _in) {
+            if (in->state() == TaskState::Raw) {
+                if (in->changedTime() >= changedTime()) {
+                    _state = TaskState::DirtyReady;
+                    return;
+                }
+            }
+            else if (in->isDirty() || in->changedTime() >= changedTime()) {
+                _state = TaskState::DirtyWaiting;
+                return;
+            }
+        }
+
+        for (auto &trigger : _triggers) {
+            if (trigger->isDirty() || trigger->changedTime() >= changedTime()) {
+                _state = TaskState::DirtyReady;
+                return;
+            }
+        }
+
+        _state = TaskState::Fresh;
     }
 
     Json dump();
@@ -232,8 +314,8 @@ private:
     std::vector<Task *> _in; // Files that needs to be built before this file
 
     // Others used to calculate state
-    size_t waiting = 0;
     std::vector<Task *> _triggers; // Files that mark this task as dirty
     std::vector<Task *> _subscribers;
     TimePoint _changedTime;
+    TaskState _state = TaskState::NotCalculated;
 };

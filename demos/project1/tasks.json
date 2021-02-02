@@ -12,26 +12,28 @@
     "out": "./src/precompiled.hpp"
   },
   {
-    "out": "src/precompiled.hpp.pch",
+    "out": "src/precompiled.hpp.gch",
     "in": [ "./src/precompiled.hpp" ],
-    "depfile": "src/precompiled.hpp.pch.d",
-    "command": "[pch]"
+    "depfile": "src/precompiled.hpp.gch.d",
+    "command": "[gch]"
   },
   {
-    "src": "data/Readme.md",
+    "in": [ "./data/Readme.md" ],
     "out": "Readme.md",
     "command": "[copy]"
   },
   {
     "src": "src/main.cpp",
-    "in": [ "./src/main.cpp", "src/precompiled.hpp.pch" ],
+    "in": [ "src/precompiled.hpp.gch" ],
+    "deps": [ "./src/main.cpp" ],
     "depfile": "main.o.d",
     "out": "main.o",
     "command": "[cxx]"
   },
   {
     "src": "src/other.cpp",
-    "in": [ "./src/other.cpp", "src/precompiled.hpp.pch" ],
+    "in": [ "src/precompiled.hpp.gch" ],
+    "deps": [ "./src/other.cpp" ],
     "depfile": "other.o.d",
     "out": "other.o",
     "command": "[cxx]"
@@ -53,7 +55,7 @@
   },
   {
     "name": "all",
-    "in": [ "@main" ],
+    "in": [ "@main", "./data/Readme.md" ],
     "config": [
       "c++17"
     ]
@@ -67,7 +69,7 @@
     "commands": {
       "cxx": "{c++} {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}",
       "exe": "{c++} {in} -o {out} {ldflags} {includes}",
-      "pch": "{c++} {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}"
+      "gch": "{c++} {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}"
     }
   }
 ]

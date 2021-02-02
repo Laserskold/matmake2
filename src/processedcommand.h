@@ -33,7 +33,7 @@ public:
     ProcessedCommand &operator=(ProcessedCommand &&) = default;
 
     template <class T>
-    std::string expandCommand(const T &task) {
+    std::string expand(const T &task) {
         std::ostringstream ss;
 
         for (auto s : segments) {

@@ -70,3 +70,5 @@ struct TaskList {
 };
 
 std::unique_ptr<TaskList> parseTasks(filesystem::path path);
+
+void printFlat(const TaskList &list);
