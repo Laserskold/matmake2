@@ -36,10 +36,43 @@ void Task::parse(const Json &jtask) {
     if (auto f = jsonFind("depfile")) {
         depfile(f->string());
     }
+    if (auto f = jsonFind("c++")) {
+        cxx(f->string());
+    }
 }
 
 Json Task::dump() {
-    return Json{};
+    auto json = Json{};
+
+    auto attachValue = [&json](const std::string name, std::string value) {
+        if (!value.empty()) {
+            json[name] = value;
+        }
+    };
+
+    attachValue("name", _name);
+    attachValue("out", _out.string());
+    attachValue("dir", _dir.string());
+    attachValue("depfile", _depfile.string());
+    attachValue("command", _command);
+    attachValue("c++", _cxx.string());
+
+    if (!_in.empty()) {
+        auto j = Json{Json::Array};
+
+        for (auto i : _in) {
+            auto ij = Json{Json::String};
+            if (i->_name.empty()) {
+                ij.string(i->_out.string());
+            }
+            else {
+                ij.string("@" + i->_name);
+            }
+            j.push_back(ij);
+        }
+    }
+
+    return json;
 }
 
 void Task::print(size_t indentation) {
@@ -68,6 +101,9 @@ void Task::print(size_t indentation) {
     }
 
     indent() << "dir: " << dir() << "\n";
+
+    indent() << "exists: " << (filesystem::exists(out()) ? "yes" : "no")
+             << "\n";
 
     {
         auto commands = this->commands();

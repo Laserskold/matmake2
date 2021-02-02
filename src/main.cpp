@@ -2,7 +2,6 @@
 
 #include "filesystem.h"
 #include "task.h"
-#include "taskio.h"
 #include "tasklist.h"
 #include "json/json.h"
 #include <fstream>
@@ -18,7 +17,14 @@ void connectTasks(TaskList &list, const Json &json) {
         if (auto f = data.find("in"); f != data.end()) {
             if (f->type == Json::Array) {
                 for (auto &value : *f) {
-                    task.pushIn(list.find(value.string()));
+                    auto ftask = list.find(value.string());
+                    if (ftask) {
+                        task.pushIn(ftask);
+                    }
+                    else {
+                        throw std::runtime_error{"could not find task " +
+                                                 value.string()};
+                    }
                 }
             }
             else {

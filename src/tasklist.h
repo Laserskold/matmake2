@@ -30,6 +30,13 @@ struct TaskList {
                 }
             }
         }
+        else if (name.rfind("./") == 0) {
+            for (auto &t : _tasks) {
+                if (t.rawOut() == name) {
+                    return &t;
+                }
+            }
+        }
         else {
             for (auto &t : _tasks) {
                 if (t.out() == name) {

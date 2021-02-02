@@ -49,6 +49,9 @@ private:
 
 struct Task {
     Task() = default;
+    Task(const class Json &json) {
+        parse(json);
+    }
     Task(const Task &) = delete;
     Task(Task &&) = default;
     Task &operator=(const Task &) = delete;
@@ -72,7 +75,19 @@ struct Task {
     }
 
     filesystem::path out() const {
-        return dir() / _out;
+        if (_out.empty()) {
+            return {};
+        }
+        else if (*_out.begin() == ".") {
+            return _out;
+        }
+        else {
+            return dir() / _out;
+        }
+    }
+
+    filesystem::path rawOut() const {
+        return _out;
     }
 
     void out(filesystem::path path) {
@@ -97,6 +112,24 @@ struct Task {
         return _in;
     }
 
+    std::string concatIn() const {
+        if (_in.empty()) {
+            return {};
+        }
+
+        std::string ret;
+
+        if (!_src.empty()) {
+            ret += _src.string() + " ";
+        }
+
+        for (auto &in : _in) {
+            ret += in->out().string() + " ";
+        }
+
+        return ret;
+    }
+
     void parent(Task *parent) {
         _parent = parent;
     }
@@ -115,12 +148,7 @@ struct Task {
 
     filesystem::path dir() const {
         if (_parent) {
-            if (_dir.empty()) {
-                return _parent->dir();
-            }
-            else {
-                return _parent->dir() / _dir; // Fix double slashes somhow
-            }
+            return _parent->dir() / _dir; // Fix double slashes somhow
         }
         else {
             return _dir;
@@ -139,6 +167,12 @@ struct Task {
         }
         else if (name == "depfile") {
             return depfile().string();
+        }
+        else if (name == "in") {
+            return concatIn();
+        }
+        else if (name == "c++") {
+            return cxx().string();
         }
         return {};
     }
@@ -197,6 +231,22 @@ struct Task {
         }
     }
 
+    void cxx(filesystem::path cxx) {
+        _cxx = cxx;
+    }
+
+    filesystem::path cxx() const {
+        if (!_cxx.empty()) {
+            return _cxx;
+        }
+        else if (_parent) {
+            return _parent->cxx();
+        }
+        else {
+            return {};
+        }
+    }
+
     void parse(const class Json &jtask);
 
     Json dump();
@@ -210,18 +260,18 @@ private:
     filesystem::path _out;
     filesystem::path _dir;
     filesystem::path _depfile;
-
-    std::string _name; // If empty-same as out
-
-    size_t waiting = 0;
-    std::vector<Task *> _in; // Files that needs to be built before this file
-    std::vector<filesystem::path>
-        triggers; // Files that mark this task as dirty
-
-    std::vector<Task *> subscribers;
-
+    filesystem::path _cxx;
+    std::string _name;                            // If empty-same as out
     std::string _command;                         // If empty use parents
     std::map<std::string, std::string> _commands; // Parents build command
+
+    // Fixed during connection step
+    std::vector<Task *> _in; // Files that needs to be built before this file
+
+    // Others used to calculate state
+    size_t waiting = 0;
+    std::vector<Task *> triggers; // Files that mark this task as dirty
+    std::vector<Task *> subscribers;
 };
 
 inline std::string ProcessedCommand::expandCommand(const Task &task) {

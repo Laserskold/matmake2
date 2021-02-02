@@ -1,36 +1,37 @@
 ﻿[
   {
-    "out": "src/main.cpp"
+    "out": "./src/main.cpp"
   },
   {
-    "out": "src/other.cpp"
+    "out": "./src/other.cpp"
   },
   {
-    "out": "data/Readme.md"
+    "out": "./data/Readme.md"
   },
   {
-    "out": "src/precompiled.hpp"
+    "out": "./src/precompiled.hpp"
   },
   {
     "out": "src/precompiled.hpp.pch",
-    "in": "src/precompiled.hpp",
+    "src": "src/precompiled.hpp",
+    "depfile": "src/precompiled.hpp.pch.d",
     "command": "[pch]"
   },
   {
-    "in": "data/Readme.md",
+    "src": "data/Readme.md",
     "out": "Readme.md",
     "command": "[copy]"
   },
   {
     "src": "src/main.cpp",
-    "in": [ "src/precompiled.hpp.pch", "src/main.cpp" ],
+    "in": [ "./src/main.cpp", "src/precompiled.hpp.pch" ],
     "depfile": "main.o.d",
     "out": "main.o",
     "command": "[compile]"
   },
   {
     "src": "src/other.cpp",
-    "in": [ "src/precompiled.hpp.pch", "src/other.cpp" ],
+    "in": [ "./src/other.cpp", "src/precompiled.hpp.pch" ],
     "depfile": "other.o.d",
     "out": "other.o",
     "command": "[compile]"
@@ -62,11 +63,11 @@
     "in": [ "@all" ],
     "dir": "g++",
     "cxxflags": "-Wall -Wpedantic -Wextra",
-    "compiler": "g++",
+    "c++": "g++",
     "commands": {
-      "compile": "g++ {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}",
-      "link": "g++ {in} -o {out} {ldflags} {includes}",
-      "pch": "g++ {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}"
+      "compile": "{c++} {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}",
+      "link": "{c++} {in} -o {out} {ldflags} {includes}",
+      "pch": "{c++} {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}"
     }
   }
 ]
