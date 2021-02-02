@@ -55,8 +55,8 @@ public:
         using namespace std::chrono_literals;
         _status = CoordinatorStatus::Running;
 
-        //        auto nThreads = std::thread::hardware_concurrency();
-        auto nThreads = 1;
+        auto nThreads = std::thread::hardware_concurrency();
+        //        auto nThreads = 1;
 
         {
             auto lock = std::scoped_lock{_todoMutex};
@@ -90,9 +90,6 @@ public:
                             std::cout
                                 << " do not build task " << task->name()
                                 << " because no output files is specified\n";
-                            //                            auto lock =
-                            //                            std::scoped_lock{_subscriberMutex};
-                            //                            _finished.push_back(task);
                             pushFinished(task);
                             continue;
                         }
@@ -104,9 +101,6 @@ public:
                                 _status = CoordinatorStatus::Failed;
                             }
                             else {
-                                //                                auto lock =
-                                //                                std::scoped_lock{_subscriberMutex};
-                                //                                _finished.push_back(task);
                                 pushFinished(task);
                             }
                         }
@@ -119,10 +113,6 @@ public:
                                     _status = CoordinatorStatus::Failed;
                                 }
                                 else {
-                                    //                                    auto
-                                    //                                    lock =
-                                    //                                        std::scoped_lock{_subscriberMutex};
-                                    //                                    _finished.push_back(task);
                                     pushFinished(task);
                                 }
                             }
@@ -186,6 +176,7 @@ public:
 
     void pushFinished(Task *task) {
         auto lock = std::scoped_lock{_subscriberMutex};
+        std::cout << "task " + task->name() + " finished" << std::endl;
         _finished.push_back(task);
     }
 

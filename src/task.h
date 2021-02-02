@@ -276,6 +276,7 @@ struct Task {
         }
     }
 
+    // Todo: This needs some unit tests
     void updateState() {
         if (_state != TaskState::NotCalculated) {
             return;
@@ -296,16 +297,14 @@ struct Task {
             if (in->state() == TaskState::Raw) {
                 if (in->changedTime() > changedTime()) {
                     _state = TaskState::DirtyReady;
-                    return;
                 }
             }
             else if (in->isDirty()) {
                 _state = TaskState::DirtyWaiting;
-                return;
+                return; // No need to check more if other task is blocking
             }
             else if (in->changedTime() >= changedTime()) {
                 _state = TaskState::DirtyReady;
-                return;
             }
         }
 
@@ -316,7 +315,9 @@ struct Task {
             }
         }
 
-        _state = TaskState::Fresh;
+        if (_state == TaskState::NotCalculated) {
+            _state = TaskState::Fresh;
+        }
     }
 
     Json dump();

@@ -42,7 +42,6 @@
     "name": "main",
     "in": [ "main.o", "other.o" ],
     "out": "main.exe",
-    "dir": "build",
     "flags": "-Wall",
     "type": "exe",
     "includes": [
