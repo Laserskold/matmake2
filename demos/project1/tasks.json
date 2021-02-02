@@ -12,6 +12,9 @@
     "out": "./src/precompiled.hpp"
   },
   {
+    "out": "./src/other.h"
+  },
+  {
     "out": "src/precompiled.hpp.gch",
     "in": [ "./src/precompiled.hpp" ],
     "depfile": "src/precompiled.hpp.gch.d",
@@ -26,21 +29,21 @@
     "src": "src/main.cpp",
     "in": [ "./src/main.cpp", "src/precompiled.hpp.gch" ],
     "deps": [ ],
-    "depfile": "main.o.d",
-    "out": "main.o",
+    "depfile": "src/main.o.d",
+    "out": "src/main.o",
     "command": "[cxx]"
   },
   {
     "src": "src/other.cpp",
     "in": [ "./src/other.cpp", "src/precompiled.hpp.gch" ],
     "deps": [ ],
-    "depfile": "other.o.d",
-    "out": "other.o",
+    "depfile": "src/other.o.d",
+    "out": "src/other.o",
     "command": "[cxx]"
   },
   {
     "name": "main",
-    "in": [ "main.o", "other.o" ],
+    "in": [ "src/main.o", "src/other.o" ],
     "out": "main.exe",
     "flags": "-Wall",
     "type": "exe",
@@ -66,9 +69,9 @@
     "cxxflags": "-Wall -Wpedantic -Wextra",
     "c++": "g++",
     "commands": {
-      "cxx": "{c++} {in} -o {out} -c -MMD -MT {depfile} {cxxflags} {flags} {includes}",
+      "cxx": "{c++} {in} -o {out} -c -MD -MF {depfile} {cxxflags} {flags} {includes}",
       "exe": "{c++} {in} -o {out} {ldflags} {includes}",
-      "gch": "{c++} {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}"
+      "gch": "{c++} {in} -o {out} -MD -MF {depfile} {cxxflags} {flags} {includes}"
     }
   }
 ]

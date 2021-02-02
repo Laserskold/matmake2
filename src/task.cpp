@@ -129,7 +129,7 @@ void Task::print(bool verbose, size_t indentation) {
     }
 
     if (!triggers().empty()) {
-        indent() << "in:\n";
+        indent() << "triggers:\n";
         for (auto &trigger : triggers()) {
             trigger->print(verbose, indentation + 1);
         }

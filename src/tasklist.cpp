@@ -1,4 +1,5 @@
 #include "tasklist.h"
+#include "parsedepfile.h"
 #include "json/json.h"
 
 namespace {
@@ -47,6 +48,16 @@ void connectTasks(TaskList &list, const Json &json) {
 }
 
 void calculateState(TaskList &list) {
+    for (auto &task : list) {
+        auto depfile = task.depfile();
+        if (depfile.empty()) {
+            continue;
+        }
+        for (auto &f : parseDepFile(depfile).deps) {
+            task.pushTrigger(list.find(f.string()));
+        }
+    }
+
     for (auto &task : list) {
         task.updateState();
     }

@@ -133,7 +133,7 @@ struct Task {
 
     filesystem::path dir() const {
         if (_parent) {
-            return _parent->dir() / _dir; // Fix double slashes somhow
+            return _parent->dir() / _dir;
         }
         else {
             return _dir;
@@ -167,7 +167,12 @@ struct Task {
     }
 
     filesystem::path depfile() const {
-        return _depfile;
+        if (!_depfile.empty()) {
+            return dir() / _depfile;
+        }
+        else {
+            return {};
+        }
     }
 
     void command(std::string command) {

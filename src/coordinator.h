@@ -56,7 +56,6 @@ public:
         _status = CoordinatorStatus::Running;
 
         auto nThreads = std::thread::hardware_concurrency();
-        //        auto nThreads = 1;
 
         {
             auto lock = std::scoped_lock{_todoMutex};

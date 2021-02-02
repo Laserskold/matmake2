@@ -1,3 +1,3 @@
 #pragma once
 
-int other();
+int other(); // test
