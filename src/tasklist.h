@@ -23,6 +23,7 @@ struct TaskList {
 
     Task *find(std::string name) {
         if (name.front() == '@') {
+            name = name.substr(1);
             for (auto &t : _tasks) {
                 if (t.name() == name) {
                     return &t;

@@ -60,6 +60,8 @@
   {
     "name": "g++",
     "in": [ "@all" ],
+    "dir": "g++",
+    "cxxflags": "-Wall -Wpedantic -Wextra",
     "compiler": "g++",
     "commands": {
       "compile": "g++ {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}",

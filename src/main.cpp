@@ -27,7 +27,45 @@ void connectTasks(TaskList &list, const Json &json) {
     }
 }
 
-std::unique_ptr<TaskList> parseTasks(std::filesystem::path path) {
+void parseTask(Task &task, const Json &jtask) {
+    auto jsonFind = [&jtask](std::string name) -> const Json * {
+        auto f = jtask.find(name);
+        if (f != jtask.end()) {
+            return &*f;
+        }
+        else {
+            return nullptr;
+        }
+    };
+    //    auto &task = list->emplace();
+    if (auto f = jsonFind("name")) {
+        task.name(f->string());
+    }
+    if (auto f = jsonFind("out")) {
+        task.out(f->string());
+    }
+    if (auto f = jsonFind("command")) {
+        task.command(f->string());
+    }
+    if (auto f = jsonFind("commands")) {
+        if (f->type == Json::Object) {
+            std::map<std::string, std::string> commands;
+            for (auto &child : *f) {
+                commands[child.name] = child.value;
+            }
+
+            task.commands(std::move(commands));
+        }
+    }
+    if (auto f = jsonFind("dir")) {
+        task.dir(f->string());
+    }
+    if (auto f = jsonFind("depfile")) {
+        task.depfile(f->string());
+    }
+}
+
+std::unique_ptr<TaskList> parseTasks(filesystem::path path) {
     auto list = std::make_unique<TaskList>();
     auto json = Json{};
     auto file = std::ifstream{path};
@@ -44,13 +82,7 @@ std::unique_ptr<TaskList> parseTasks(std::filesystem::path path) {
     list->reserve(json.size());
 
     for (const auto &jtask : json) {
-        auto &task = list->emplace();
-        if (auto f = jtask.find("name"); f != jtask.end()) {
-            task.name(f->string());
-        }
-        if (auto f = jtask.find("out"); f != jtask.end()) {
-            task.out(f->string());
-        }
+        parseTask(list->emplace(), jtask);
     }
 
     connectTasks(*list, json);
@@ -65,6 +97,7 @@ void printList(const TaskList &list) {
         if (task.parent()) {
             std::cout << "  parent = " << task.parent()->out() << "\n";
         }
+
         {
             auto &in = task.in();
             for (auto &i : in) {
@@ -75,16 +108,47 @@ void printList(const TaskList &list) {
 }
 
 void printTree(const Task &root, size_t indentation = 0) {
-    auto indent = [indentation] {
+    auto indent = [indentation]() -> std::ostream & {
         for (size_t i = 0; i < indentation; ++i) {
             std::cout << "  ";
         }
+        return std::cout;
     };
 
     indent();
+    std::cout << root.name() << " " << root.out() << "\n";
 
-    std::cout << root.out() << "\n";
+    try {
+        {
+            auto command = root.command();
+            indent();
+            std::cout << "command: "
+                      << ProcessedCommand{command}.expandCommand(root) << "\n";
 
+            indent();
+            std::cout << "raw: " << command << "\n";
+        }
+    }
+    catch (...) {
+    }
+
+    indent() << "dir: " << root.dir() << "\n";
+
+    {
+        auto commands = root.commands();
+        if (!commands.empty()) {
+            indent() << "defined commands\n";
+        }
+
+        for (const auto &command : commands) {
+            indent() << "  \"" << command.first << " = " << command.second
+                     << "\"\n";
+        }
+    }
+
+    if (!root.in().empty()) {
+        indent() << "in:\n";
+    }
     for (auto &in : root.in()) {
         printTree(*in, indentation + 1);
     }
@@ -93,14 +157,16 @@ void printTree(const Task &root, size_t indentation = 0) {
 int main(int, char **) {
     std::cout << "hello\n" << std::endl;
 
-    std::filesystem::current_path("demos/project1");
+    filesystem::current_path("demos/project1");
     auto tasks = parseTasks("tasks.json");
 
     printList(*tasks);
 
-    std::cout << "\ntree\n";
+    std::cout << "\ntreeview\n==================\n";
+    auto &root = *tasks->find("@g++");
+    printTree(root);
 
-    printTree(*tasks->find("main.exe"));
+    std::cout << "root [pch] = " << root.commandAt("pch") << "\n";
 
     return 0;
 }
