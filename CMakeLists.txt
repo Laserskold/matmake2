@@ -10,6 +10,7 @@ add_executable (
 	matmake2
         "src/main.cpp"
         "src/task.cpp"
+        "src/tasklist.cpp"
         "src/precompiled.h"
 	"src/targetnode.h"
 	"src/task.h"

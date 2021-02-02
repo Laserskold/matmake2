@@ -2,6 +2,7 @@
 
 #include "filesystem.h"
 #include <algorithm>
+#include <chrono>
 #include <map>
 #include <sstream>
 #include <string>
@@ -48,6 +49,8 @@ private:
 };
 
 struct Task {
+    using TimePoint = filesystem::file_time_type;
+
     Task() = default;
     Task(const class Json &json) {
         parse(json);
@@ -70,9 +73,9 @@ struct Task {
         _name = std::move(value);
     }
 
-    filesystem::path src() const {
-        return _src;
-    }
+    //    filesystem::path src() const {
+    //        return _src;
+    //    }
 
     filesystem::path out() const {
         if (_out.empty()) {
@@ -119,9 +122,9 @@ struct Task {
 
         std::string ret;
 
-        if (!_src.empty()) {
-            ret += _src.string() + " ";
-        }
+        //        if (!_src.empty()) {
+        //            ret += _src.string() + " ";
+        //        }
 
         for (auto &in : _in) {
             ret += in->out().string() + " ";
@@ -247,16 +250,24 @@ struct Task {
         }
     }
 
+    TimePoint changedTime() {
+        return _changedTime;
+    }
+
     void parse(const class Json &jtask);
+
+    void updateState() {
+        _changedTime = filesystem::last_write_time(out());
+    }
 
     Json dump();
 
     //! Print tree view from node
-    void print(size_t indentation = 0);
+    void print(bool verbose = false, size_t indentation = 0);
 
 private:
     Task *_parent = nullptr;
-    filesystem::path _src;
+    //    filesystem::path _src;
     filesystem::path _out;
     filesystem::path _dir;
     filesystem::path _depfile;
@@ -270,8 +281,9 @@ private:
 
     // Others used to calculate state
     size_t waiting = 0;
-    std::vector<Task *> triggers; // Files that mark this task as dirty
-    std::vector<Task *> subscribers;
+    std::vector<Task *> _triggers; // Files that mark this task as dirty
+    std::vector<Task *> _subscribers;
+    TimePoint _changedTime;
 };
 
 inline std::string ProcessedCommand::expandCommand(const Task &task) {

@@ -68,3 +68,5 @@ struct TaskList {
         return _tasks.end();
     }
 };
+
+std::unique_ptr<TaskList> parseTasks(filesystem::path path);

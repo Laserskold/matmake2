@@ -13,7 +13,7 @@
   },
   {
     "out": "src/precompiled.hpp.pch",
-    "src": "src/precompiled.hpp",
+    "in": [ "./src/precompiled.hpp" ],
     "depfile": "src/precompiled.hpp.pch.d",
     "command": "[pch]"
   },
@@ -27,14 +27,14 @@
     "in": [ "./src/main.cpp", "src/precompiled.hpp.pch" ],
     "depfile": "main.o.d",
     "out": "main.o",
-    "command": "[compile]"
+    "command": "[cxx]"
   },
   {
     "src": "src/other.cpp",
     "in": [ "./src/other.cpp", "src/precompiled.hpp.pch" ],
     "depfile": "other.o.d",
     "out": "other.o",
-    "command": "[compile]"
+    "command": "[cxx]"
   },
   {
     "name": "main",
@@ -49,7 +49,7 @@
     "sysincludes": [
       "bla"
     ],
-    "command": "[link]"
+    "command": "[exe]"
   },
   {
     "name": "all",
@@ -65,8 +65,8 @@
     "cxxflags": "-Wall -Wpedantic -Wextra",
     "c++": "g++",
     "commands": {
-      "compile": "{c++} {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}",
-      "link": "{c++} {in} -o {out} {ldflags} {includes}",
+      "cxx": "{c++} {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}",
+      "exe": "{c++} {in} -o {out} {ldflags} {includes}",
       "pch": "{c++} {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}"
     }
   }

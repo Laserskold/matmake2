@@ -75,7 +75,7 @@ Json Task::dump() {
     return json;
 }
 
-void Task::print(size_t indentation) {
+void Task::print(bool verbose, size_t indentation) {
     auto indent = [indentation]() -> std::ostream & {
         for (size_t i = 0; i < indentation; ++i) {
             std::cout << "  ";
@@ -105,7 +105,7 @@ void Task::print(size_t indentation) {
     indent() << "exists: " << (filesystem::exists(out()) ? "yes" : "no")
              << "\n";
 
-    {
+    if (verbose) {
         auto commands = this->commands();
         if (!commands.empty()) {
             indent() << "defined commands\n";
@@ -121,6 +121,8 @@ void Task::print(size_t indentation) {
         indent() << "in:\n";
     }
     for (auto &in : in()) {
-        in->print(indentation + 1);
+        in->print(verbose, indentation + 1);
     }
+
+    indent() << " -- \n";
 }
