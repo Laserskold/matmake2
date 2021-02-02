@@ -24,16 +24,16 @@
   },
   {
     "src": "src/main.cpp",
-    "in": [ "src/precompiled.hpp.gch" ],
-    "deps": [ "./src/main.cpp" ],
+    "in": [ "./src/main.cpp", "src/precompiled.hpp.gch" ],
+    "deps": [ ],
     "depfile": "main.o.d",
     "out": "main.o",
     "command": "[cxx]"
   },
   {
     "src": "src/other.cpp",
-    "in": [ "src/precompiled.hpp.gch" ],
-    "deps": [ "./src/other.cpp" ],
+    "in": [ "./src/other.cpp", "src/precompiled.hpp.gch" ],
+    "deps": [ ],
     "depfile": "other.o.d",
     "out": "other.o",
     "command": "[cxx]"
@@ -63,11 +63,11 @@
   {
     "name": "g++",
     "in": [ "@all" ],
-    "dir": "g++",
+    "dir": "build/g++",
     "cxxflags": "-Wall -Wpedantic -Wextra",
     "c++": "g++",
     "commands": {
-      "cxx": "{c++} {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}",
+      "cxx": "{c++} {in} -o {out} -c -MMD -MT {depfile} {cxxflags} {flags} {includes}",
       "exe": "{c++} {in} -o {out} {ldflags} {includes}",
       "gch": "{c++} {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}"
     }

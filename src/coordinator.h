@@ -64,10 +64,10 @@ public:
                 auto state = task.state();
                 if (state == TaskState::DirtyReady) {
                     _todo.push_back(&task);
-                    ++_remainingTasks;
+                    ++_numTasks;
                 }
                 else if (state == TaskState::DirtyWaiting) {
-                    ++_remainingTasks;
+                    ++_numTasks;
                 }
             }
         }
@@ -84,12 +84,30 @@ public:
             workers.emplace_back([this, i] {
                 std::cout << "starting thread " << i << "\n";
                 while (_status == CoordinatorStatus::Running) {
-                    if (auto task = getTask()) {
+                    if (auto task = popTask()) {
+                        auto out = task->out();
+                        if (out.empty()) {
+                            std::cout
+                                << " do not build task " << task->name()
+                                << " because no output files is specified\n";
+                            //                            auto lock =
+                            //                            std::scoped_lock{_subscriberMutex};
+                            //                            _finished.push_back(task);
+                            pushFinished(task);
+                            continue;
+                        }
+
                         auto rawCommand = task->command();
 
                         if (auto f = native::findCommand(rawCommand)) {
                             if (f(*task) == native::CommandStatus::Failed) {
                                 _status = CoordinatorStatus::Failed;
+                            }
+                            else {
+                                //                                auto lock =
+                                //                                std::scoped_lock{_subscriberMutex};
+                                //                                _finished.push_back(task);
+                                pushFinished(task);
                             }
                         }
                         else {
@@ -99,6 +117,13 @@ public:
                             if (!command.empty()) {
                                 if (run(command) == RunStatus::Failed) {
                                     _status = CoordinatorStatus::Failed;
+                                }
+                                else {
+                                    //                                    auto
+                                    //                                    lock =
+                                    //                                        std::scoped_lock{_subscriberMutex};
+                                    //                                    _finished.push_back(task);
+                                    pushFinished(task);
                                 }
                             }
                         }
@@ -110,12 +135,38 @@ public:
             });
         }
 
+        while (_status == CoordinatorStatus::Running) {
+            if (_finished.empty()) {
+                std::this_thread::sleep_for(10ms);
+            }
+            else {
+                auto lock = std::scoped_lock{_subscriberMutex};
+                auto finishedTask = _finished.front();
+                for (auto task : finishedTask->subscribers()) {
+                    if (task->state() == TaskState::DirtyWaiting) {
+                        task->subscribtionNotice(finishedTask);
+                        if (task->state() == TaskState::DirtyReady) {
+                            pushTask(task);
+                        }
+                    }
+                }
+                _finished.erase(_finished.begin(), _finished.begin() + 1);
+
+                ++_numFinished;
+                if (_numFinished >= _numTasks) {
+                    _status = CoordinatorStatus::Done;
+                }
+            }
+        }
+
         for (auto &worker : workers) {
             worker.join();
         }
     }
 
-    Task *getTask() {
+    void handleSubscribers() {}
+
+    [[nodiscard]] Task *popTask() {
         auto lock = std::scoped_lock{_todoMutex};
 
         if (_todo.empty()) {
@@ -128,6 +179,16 @@ public:
         }
     }
 
+    void pushTask(Task *task) {
+        auto lock = std::scoped_lock{_todoMutex};
+        _todo.push_back(task);
+    }
+
+    void pushFinished(Task *task) {
+        auto lock = std::scoped_lock{_subscriberMutex};
+        _finished.push_back(task);
+    }
+
 private:
     std::vector<std::thread> workers;
     CoordinatorStatus _status = CoordinatorStatus::NotStarted;
@@ -137,7 +198,8 @@ private:
     std::vector<Task *> _todo;
 
     // Handle when tasks are finished
-    size_t _remainingTasks;
+    size_t _numTasks;
+    size_t _numFinished;
     std::mutex _subscriberMutex;
     std::vector<Task *> _finished;
 };

@@ -15,6 +15,7 @@ enum class TaskState {
     Fresh,
     DirtyReady,
     DirtyWaiting,
+    Done,
 };
 
 struct Task {
@@ -100,7 +101,15 @@ struct Task {
         std::string ret;
 
         for (auto &in : _in) {
-            ret += in->out().string() + " ";
+            auto fname = in->out();
+            auto ext = fname.extension();
+            if (ext == ".gch" || ext == ".pch" || ext == "") {
+                fname.replace_extension("");
+                ret += " -include " + fname.string() + " ";
+            }
+            else {
+                ret += fname.string() + " ";
+            }
         }
 
         return ret;
@@ -201,12 +210,10 @@ struct Task {
         else if (_parent) {
             return _parent->commandAt(name);
         }
-        return name;
-        //        else {
-        //            throw std::runtime_error{"could not find " + name + " on
-        //            target " +
-        //                                     this->name()};
-        //        }
+        else {
+            throw std::runtime_error{"could not find " + name + " on target " +
+                                     this->name()};
+        }
     }
 
     void cxx(filesystem::path cxx) {
@@ -236,6 +243,21 @@ struct Task {
     bool isDirty() {
         updateState();
         return _state != TaskState::Fresh && _state != TaskState::Raw;
+    }
+
+    // Let this task know that one of its in-tasks is ready
+    void subscribtionNotice(Task *task) {
+        auto it = std::remove(_triggers.begin(), _triggers.end(), task);
+        _triggers.erase(it, _triggers.end());
+        if (_triggers.empty()) {
+            if (_state == TaskState::DirtyWaiting) {
+                _state = TaskState::DirtyReady;
+            }
+        }
+    }
+
+    std::vector<Task *> subscribers() {
+        return _subscribers;
     }
 
     void parse(const class Json &jtask);
@@ -272,13 +294,17 @@ struct Task {
 
         for (auto &in : _in) {
             if (in->state() == TaskState::Raw) {
-                if (in->changedTime() >= changedTime()) {
+                if (in->changedTime() > changedTime()) {
                     _state = TaskState::DirtyReady;
                     return;
                 }
             }
-            else if (in->isDirty() || in->changedTime() >= changedTime()) {
+            else if (in->isDirty()) {
                 _state = TaskState::DirtyWaiting;
+                return;
+            }
+            else if (in->changedTime() >= changedTime()) {
+                _state = TaskState::DirtyReady;
                 return;
             }
         }
