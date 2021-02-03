@@ -1,6 +1,13 @@
 ﻿# CMakeList.txt : CMake project for Matmake-v2
 cmake_minimum_required (VERSION 3.16)
 
+if ( MSVC )
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4")
+else()
+    set(CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wno-c++20-designator")
+endif()
+
 project ("matmake2")
 
 add_executable (
