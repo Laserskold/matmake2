@@ -1,11 +1,8 @@
-﻿# CMakeList.txt : CMake project for Matmake-v2, include source and define
-# project specific logic here.
-#
-cmake_minimum_required (VERSION 3.8)
+﻿# CMakeList.txt : CMake project for Matmake-v2
+cmake_minimum_required (VERSION 3.16)
 
 project ("matmake2")
 
-# Add source to this project's executable.
 add_executable (
 	matmake2
         "src/main.cpp"
@@ -29,6 +26,7 @@ file (
     DESTINATION
     ${CMAKE_CURRENT_BINARY_DIR}/demos
 )
+
 
 
 

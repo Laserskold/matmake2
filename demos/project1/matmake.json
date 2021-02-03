@@ -10,18 +10,18 @@
     "command": "[copy]"
   },
   {
-    "src": "src/*.cpp",
-    "in": [ "@pch" ],
+    "src": "src/*.cpp", // Ska skapas implicit
     "depfile": "{name}.o.d",
     "out": [ "{name}.o" ],
     "command": "[compile]"
   },
   {
     "name": "main",
-    "in": [ "main.o" ],
+    "in": [ "src/*.cpp" ],
     "out": "main.exe",
     "dir": "build",
-    "flags": "-Wall",
+    "flags": "{parent.flags} -Wall",
+    "pch" : "@pch",
     "includes": [
       "include"
     ],
@@ -41,10 +41,5 @@
     "name": "g++",
     "in": [ "@all" ],
     "compiler": "g++",
-    "commands": {
-      "compile": "g++ {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}",
-      "link": "g++ {in} -o {out} {ldflags} {includes}"
-      "compile": "g++ {in} -o {out} -MMD -MT {depfile} {cxxflags} {flags} {includes}",
-    }
   }
 ]
