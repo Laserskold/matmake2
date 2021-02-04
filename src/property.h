@@ -1,5 +1,9 @@
 #pragma once
 
+#include "task.h"
+#include "json/json.h"
+#include <string>
+
 struct Property {
     Property() = default;
     Property(const Property &) = default;

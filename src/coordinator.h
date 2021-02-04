@@ -3,7 +3,9 @@
 #include "filesystem.h"
 #include "nativecommands.h"
 #include "tasklist.h"
+#include <iostream>
 #include <map>
+#include <mutex>
 #include <string>
 #include <thread>
 
@@ -36,7 +38,7 @@ public:
         auto directories = std::map<filesystem::path, int>{};
 
         for (auto &task : tasks) {
-            ++directories[task.out().parent_path()];
+            ++directories[task->out().parent_path()];
         }
 
         for (auto &it : directories) {
@@ -60,9 +62,9 @@ public:
         {
             auto lock = std::scoped_lock{_todoMutex};
             for (auto &task : tasks) {
-                auto state = task.state();
+                auto state = task->state();
                 if (state == TaskState::DirtyReady) {
-                    _todo.push_back(&task);
+                    _todo.push_back(task.get());
                     ++_numTasks;
                 }
                 else if (state == TaskState::DirtyWaiting) {
