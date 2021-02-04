@@ -18,7 +18,8 @@ enum class TaskState {
     Done,
 };
 
-struct Task {
+class Task {
+public:
     using TimePoint = filesystem::file_time_type;
 
     Task() = default;

@@ -1,8 +1,11 @@
 ﻿// copyright Mattias Larsson Sköld 2021
 
 #include "coordinator.h"
+#include "createtasks.h"
 #include "filesystem.h"
+#include "matmakefile.h"
 #include "tasklist.h"
+#include "json/json.h"
 
 namespace {
 
@@ -12,18 +15,27 @@ matmake2 [options]
 
 options:
 --help -h             print this text
+--verbose -v          print extra information
+-C [dir]              run in another directory
+--target -t [target]  select target (eg g++, clang++, msvc)
+
+developer options:
 --tasks [taskfile]    build a task json-file
+--dry-run             only parse matmake file and dump tasklist
 --print-tree          print dependency tree
 --print-tasks         print list of tasks
---verbose -v          print extra information
+
 
 )_";
 
 struct Settings {
     filesystem::path taskFile;
+    filesystem::path matmakeFile = "matmake.json";
     bool printTree = false;
     bool printTasks = false;
     bool verbose = false;
+    bool skipBuild = false;
+    std::string target = "g++";
 
     Settings(int argc, char **argv) {
         std::vector<std::string> args{argv + 1, argv + argc};
@@ -50,6 +62,17 @@ struct Settings {
             else if (arg == "--verbose" || arg == "-v") {
                 verbose = true;
             }
+            else if (arg == "-C") {
+                ++i;
+                filesystem::current_path(args.at(i));
+            }
+            else if (arg == "--dry-run") {
+                skipBuild = true;
+            }
+            else if (arg == "--target" || arg == "-t") {
+                ++i;
+                target = arg.at(i);
+            }
         }
     }
 };
@@ -69,19 +92,38 @@ int main(int argc, char **argv) {
         }
 
         if (settings.printTree) {
-            std::cout << "\ntreeview\n==================\n";
+            std::cout << "\n"
+                         "treeview\n"
+                         "==================\n";
             auto &root = *tasks->find("@g++");
             root.print(settings.verbose);
         }
 
         std::cout << "building... \n";
 
-        auto coordinator = Coordinator{};
+        if (!settings.skipBuild) {
+            auto coordinator = Coordinator{};
 
-        coordinator.execute(*tasks);
+            coordinator.execute(*tasks);
+        }
     }
     else {
-        std::cout << "no arguments specified. Run with --help for more info\n";
+        if (!filesystem::exists(settings.matmakeFile)) {
+            std::cerr << "no matmakefile found in directory\n";
+            return 1;
+        }
+
+        auto json = Json::loadFile(settings.matmakeFile.string());
+
+        auto matmakeFile = MatmakeFile{json};
+
+        matmakeFile.print(std::cout);
+
+        auto tasks = createTasks(matmakeFile, settings.target);
+
+        for (auto &t : tasks) {
+            std::cout << t->name() << std::endl;
+        }
     }
 
     return 0;

@@ -1,45 +1,55 @@
 [
   {
-    "name": "pch",
-    "in": "[content]",
-    "content": "#include <iostream>\n#include<vector>\n"
-  },
-  {
-    "in": "data/Readme.md",
-    "out": ".",
-    "command": "[copy]"
-  },
-  {
-    "src": "src/*.cpp", // Ska skapas implicit
-    "depfile": "{name}.o.d",
-    "out": [ "{name}.o" ],
-    "command": "[compile]"
-  },
-  {
     "name": "main",
-    "in": [ "src/*.cpp" ],
     "out": "main.exe",
     "dir": "build",
-    "flags": "{parent.flags} -Wall",
-    "pch" : "@pch",
+    "flags": "{+} -Wall",
+    "pch" : [ "include/precompiled.hpp" ],
+    "src": [ "src/*.cpp", "src/*.cppm" ],
+    "copy": [
+      "data/*"
+    ],
     "includes": [
       "include"
     ],
     "sysincludes": [
       "bla"
     ],
-    "command": "[link]"
+    "command": "[exe]"
   },
   {
     "name": "all",
     "in": [ "@main" ],
     "config": [
-      "c++17"
+      "c++17",
+      "Wall",
+      "Wpedantic"
     ]
+  },
+  {
+    "name": "debug",
+    "in": "@all",
+    "config": [ "debug" ]
   },
   {
     "name": "g++",
     "in": [ "@all" ],
     "compiler": "g++",
+    "dir": "build/g++",
+    "command": "[root]"
+  },
+  {
+    "name": "g++-debug",
+    "in": [ "@debug" ],
+    "compiler": "g++",
+    "dir": "build/g++-debug",
+    "command": "[root]"
+  },
+  {
+    "name": "msvc",
+    "in": [ "@all" ],
+    "compiler": "cl",
+    "dir": "build/msvc",
+    "command": "[root]"
   }
 ]
