@@ -49,17 +49,17 @@ void connectTasks(TaskList &list, const Json &json) {
 
 void calculateState(TaskList &list) {
     for (auto &task : list) {
-        auto depfile = task.depfile();
+        auto depfile = task->depfile();
         if (depfile.empty()) {
             continue;
         }
         for (auto &f : parseDepFile(depfile).deps) {
-            task.pushTrigger(list.find(f.string()));
+            task->pushTrigger(list.find(f.string()));
         }
     }
 
     for (auto &task : list) {
-        task.updateState();
+        task->updateState();
     }
 }
 
@@ -94,14 +94,14 @@ std::unique_ptr<TaskList> parseTasks(filesystem::path path) {
 
 void printFlat(const TaskList &list) {
     for (auto &task : list) {
-        std::cout << "task: name = " << task.name() << "\n";
-        std::cout << "  out = " << task.out() << "\n";
-        if (task.parent()) {
-            std::cout << "  parent = " << task.parent()->out() << "\n";
+        std::cout << "task: name = " << task->name() << "\n";
+        std::cout << "  out = " << task->out() << "\n";
+        if (task->parent()) {
+            std::cout << "  parent = " << task->parent()->out() << "\n";
         }
 
         {
-            auto &in = task.in();
+            auto &in = task->in();
             for (auto &i : in) {
                 std::cout << "  in: " << i->out() << "\n";
             }

@@ -1,6 +1,7 @@
 #pragma once
 #include "filesystem.h"
 #include "task.h"
+#include <memory>
 #include <vector>
 
 struct TaskList {
@@ -10,15 +11,15 @@ struct TaskList {
     TaskList(TaskList &&) = delete;
     TaskList &operator=(TaskList &&) = delete;
 
-    std::vector<Task> _tasks;
+    std::vector<std::unique_ptr<Task>> _tasks;
 
     void reserve(size_t size) {
         _tasks.reserve(size);
     }
 
     Task &emplace() {
-        _tasks.emplace_back();
-        return _tasks.back();
+        _tasks.emplace_back(std::make_unique<Task>());
+        return *_tasks.back();
     }
 
     Task *find(std::string name) {
@@ -28,22 +29,22 @@ struct TaskList {
         if (name.front() == '@') {
             name = name.substr(1);
             for (auto &t : _tasks) {
-                if (t.name() == name) {
-                    return &t;
+                if (t->name() == name) {
+                    return t.get();
                 }
             }
         }
         else if (name.rfind("./") == 0) {
             for (auto &t : _tasks) {
-                if (t.rawOut() == name) {
-                    return &t;
+                if (t->rawOut() == name) {
+                    return t.get();
                 }
             }
         }
         else {
             for (auto &t : _tasks) {
-                if (t.out() == name) {
-                    return &t;
+                if (t->out() == name) {
+                    return t.get();
                 }
             }
         }
@@ -52,7 +53,7 @@ struct TaskList {
     }
 
     Task &at(size_t i) {
-        return _tasks.at(i);
+        return *_tasks.at(i);
     }
 
     auto begin() {
