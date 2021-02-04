@@ -6,7 +6,9 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -time-trace")
 endif()
 
-project ("matmake2")
+project ("matmake2" CXX)
+
+find_package( Threads )
 
 add_executable (
 	matmake2
@@ -18,6 +20,9 @@ add_executable (
 	"src/targetnode.h"
 	"src/task.h"
 )
+
+
+target_link_libraries( matmake2 ${CMAKE_THREAD_LIBS_INIT} )
 
 set_property(TARGET matmake2 PROPERTY CXX_STANDARD 17)
 
