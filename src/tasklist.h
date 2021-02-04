@@ -8,8 +8,8 @@ struct TaskList {
     TaskList() = default;
     TaskList(const TaskList &) = delete;
     TaskList &operator=(const TaskList &) = delete;
-    TaskList(TaskList &&) = delete;
-    TaskList &operator=(TaskList &&) = delete;
+    TaskList(TaskList &&) = default;
+    TaskList &operator=(TaskList &&) = default;
 
     std::vector<std::unique_ptr<Task>> _tasks;
 
@@ -20,6 +20,14 @@ struct TaskList {
     Task &emplace() {
         _tasks.emplace_back(std::make_unique<Task>());
         return *_tasks.back();
+    }
+
+    void insert(TaskList tasks) {
+        _tasks.reserve(_tasks.size() + tasks._tasks.size());
+
+        for (auto &task : tasks._tasks) {
+            _tasks.push_back(std::move(task));
+        }
     }
 
     Task *find(std::string name) {
