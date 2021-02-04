@@ -5,13 +5,36 @@
 #include "tasklist.h"
 #include <memory>
 
-std::vector<filesystem::path> expandPaths(std::string expression) {
-    if (auto f = expression.find('*'); f != std::string::npos) {
-        auto ret = std::vector<filesystem::path>{};
+std::vector<filesystem::path> expandPaths(filesystem::path expression) {
+    auto filename = expression.filename().string();
+    if (auto f = filename.find('*'); f != std::string::npos) {
+        auto dir = expression.parent_path();
+        auto beginning = filename.substr(0, f);
+        auto ending = filename.substr(f + 1);
 
-        for (auto it : filesystem::recursive_directory_iterator{"."}) {
-            auto path =
-                filesystem::relative(it.path(), "./"); // Remove this part
+        auto ret = std::vector<filesystem::path>{};
+        //        for (auto it : filesystem::recursive_directory_iterator{"."})
+        //        {
+        for (auto it : filesystem::directory_iterator{"." / dir}) {
+            if (it.path() == "." || it.path() == "..") {
+                continue;
+            }
+            auto path = filesystem::relative(it.path(),
+                                             "./"); // Remove "./" in beginning
+
+            auto fn = path.filename().string();
+
+            if (!beginning.empty()) {
+                if (fn.find(beginning) == std::string::npos) {
+                    continue;
+                }
+            }
+            if (!ending.empty()) {
+                if (fn.find(ending) == std::string::npos) {
+                    continue;
+                }
+            }
+
             ret.push_back(path);
         }
 
@@ -96,6 +119,9 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
                 }
             }
         }
+    }
+    if (auto p = root.property("out")) {
+        task.out(p->value());
     }
     {
         auto &commands = root.ocommands();
