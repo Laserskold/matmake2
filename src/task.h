@@ -242,6 +242,10 @@ public:
         return _changedTime;
     }
 
+    bool exists() {
+        return filesystem::exists(out());
+    }
+
     TaskState state() {
         return _state;
     }
@@ -299,6 +303,10 @@ public:
             return;
         }
 
+        if (!_out.empty() && !exists()) {
+            _state = TaskState::DirtyReady;
+        }
+
         for (auto &in : _in) {
             if (in->state() == TaskState::Raw) {
                 if (in->changedTime() > changedTime()) {
@@ -311,6 +319,7 @@ public:
             }
             else if (in->changedTime() >= changedTime()) {
                 _state = TaskState::DirtyReady;
+                return;
             }
         }
 
@@ -340,6 +349,8 @@ private:
     std::string _name;                            // If empty-same as out
     std::string _command;                         // If empty use parents
     std::map<std::string, std::string> _commands; // Parents build command
+    //    std::vector<std::string> _rawIn;              // string name of inputs
+    //    std::vector<std::string> _rawTriggers;        // same but for triggers
 
     // Fixed during connection step
     std::vector<Task *> _in; // Files that needs to be built before this file

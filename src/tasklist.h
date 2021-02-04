@@ -79,8 +79,22 @@ struct TaskList {
     auto end() const {
         return _tasks.end();
     }
+
+    auto &front() {
+        return *_tasks.front();
+    }
+
+    auto &back() {
+        return *_tasks.back();
+    }
+
+    bool empty() {
+        return _tasks.empty();
+    }
 };
 
 std::unique_ptr<TaskList> parseTasks(filesystem::path path);
+
+void calculateState(TaskList &list);
 
 void printFlat(const TaskList &list);

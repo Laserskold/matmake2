@@ -2,12 +2,15 @@
 
 #include "property.h"
 #include "json/json.h"
+#include <iostream>
 
 // Contains data loaded from json object
 class MatmakeNode {
 
     std::map<std::string, Property> _properties;
     std::string _name;
+
+    std::map<std::string, std::string> _commands;
 
 public:
     MatmakeNode(const Json &json) {
@@ -17,9 +20,17 @@ public:
         }
 
         for (auto &child : json) {
-            auto &prop = _properties[child.name] = Property{child};
             if (child.name == "name") {
                 _name = child.value;
+            }
+
+            if (child.name == "commands") {
+                for (auto &command : child) {
+                    _commands[command.name] = command.string();
+                }
+            }
+            else {
+                _properties[child.name] = Property{child};
             }
         }
     }
@@ -31,6 +42,10 @@ public:
         else {
             return nullptr;
         }
+    }
+
+    const auto &ocommands() const {
+        return _commands;
     }
 
     const std::string &name() const {

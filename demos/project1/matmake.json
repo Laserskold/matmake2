@@ -36,7 +36,12 @@
     "in": [ "@all" ],
     "cxx": "g++",
     "dir": "build/g++",
-    "command": "[root]"
+    "command": "[root]",
+    "commands": {
+      "cxx": "{c++} {in} -o {out} -c -MD -MF {depfile} {cxxflags} {flags} {includes}",
+      "exe": "{c++} {in} -o {out} {ldflags} {includes}",
+      "gch": "{c++} {in} -o {out} -MD -MF {depfile} {cxxflags} {flags} {includes}"
+    }
   },
   {
     "name": "g++-debug",

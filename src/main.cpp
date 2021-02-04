@@ -122,8 +122,22 @@ int main(int argc, char **argv) {
         auto tasks = createTasks(matmakeFile, settings.target);
 
         for (auto &t : tasks) {
-            std::cout << t->name() << std::endl;
+            //            std::cout << t->name() << std::endl;
             std::cout << t->dump() << std::endl;
+        }
+
+        if (settings.printTree) {
+            std::cout << "\n"
+                         "treeview\n"
+                         "==================\n";
+            auto &root = *tasks.find("@g++");
+            root.print(settings.verbose);
+            std::cout.flush();
+        }
+
+        if (!settings.skipBuild) {
+            auto coordinator = Coordinator{};
+            coordinator.execute(tasks);
         }
     }
 

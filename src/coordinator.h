@@ -42,7 +42,10 @@ public:
         }
 
         for (auto &it : directories) {
-            if (!filesystem::exists(it.first)) {
+            if (it.first.empty()) {
+                continue;
+            }
+            else if (!filesystem::exists(it.first)) {
                 filesystem::create_directories(it.first);
             }
             else if (!filesystem::is_directory(it.first)) {

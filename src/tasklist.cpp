@@ -1,6 +1,7 @@
 #include "tasklist.h"
 #include "parsedepfile.h"
 #include "json/json.h"
+#include <iostream>
 
 namespace {
 
@@ -47,6 +48,8 @@ void connectTasks(TaskList &list, const Json &json) {
     }
 }
 
+} // namespace
+
 void calculateState(TaskList &list) {
     for (auto &task : list) {
         auto depfile = task->depfile();
@@ -62,8 +65,6 @@ void calculateState(TaskList &list) {
         task->updateState();
     }
 }
-
-} // namespace
 
 std::unique_ptr<TaskList> parseTasks(filesystem::path path) {
     auto list = std::make_unique<TaskList>();

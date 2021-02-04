@@ -1,5 +1,6 @@
 #include "task.h"
 #include "json/json.h"
+#include <iostream>
 
 void Task::parse(const Json &jtask) {
     auto jsonFind = [&jtask](std::string name) -> const Json * {
@@ -39,6 +40,19 @@ void Task::parse(const Json &jtask) {
     if (auto f = jsonFind("c++")) {
         cxx(f->string());
     }
+    //    if (auto f = jsonFind("in")) {
+    //        if (f->type == Json::Array) {
+    //            _rawIn.reserve(f->size());
+    //            for (auto &j : *f) {
+    //                _rawIn.push_back(j.value);
+    //            }
+    //        }
+    //        else {
+    //            throw std::runtime_error{"wrong type for 'in', expected array
+    //            " +
+    //                                     std::string{f->pos}};
+    //        }
+    //    }
 }
 
 Json Task::dump() {
@@ -58,7 +72,8 @@ Json Task::dump() {
     attachValue("cxx", _cxx.string());
 
     if (!_in.empty()) {
-        auto j = Json{Json::Array};
+        auto &j = json["in"];
+        j.type = Json::Array;
 
         for (auto i : _in) {
             auto ij = Json{Json::String};
@@ -69,6 +84,13 @@ Json Task::dump() {
                 ij.string("@" + i->_name);
             }
             j.push_back(ij);
+        }
+    }
+
+    if (!_commands.empty()) {
+        auto &c = json["commands"];
+        for (auto &command : _commands) {
+            c[command.first] = command.second;
         }
     }
 
