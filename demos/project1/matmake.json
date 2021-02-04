@@ -34,21 +34,21 @@
   {
     "name": "g++",
     "in": [ "@all" ],
-    "compiler": "g++",
+    "cxx": "g++",
     "dir": "build/g++",
     "command": "[root]"
   },
   {
     "name": "g++-debug",
     "in": [ "@debug" ],
-    "compiler": "g++",
+    "cxx": "g++",
     "dir": "build/g++-debug",
     "command": "[root]"
   },
   {
     "name": "msvc",
     "in": [ "@all" ],
-    "compiler": "cl",
+    "cxx": "cl",
     "dir": "build/msvc",
     "command": "[root]"
   }

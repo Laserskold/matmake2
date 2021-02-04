@@ -55,7 +55,7 @@ Json Task::dump() {
     attachValue("dir", _dir.string());
     attachValue("depfile", _depfile.string());
     attachValue("command", _command);
-    attachValue("c++", _cxx.string());
+    attachValue("cxx", _cxx.string());
 
     if (!_in.empty()) {
         auto j = Json{Json::Array};

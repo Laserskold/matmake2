@@ -123,6 +123,7 @@ int main(int argc, char **argv) {
 
         for (auto &t : tasks) {
             std::cout << t->name() << std::endl;
+            std::cout << t->dump() << std::endl;
         }
     }
 

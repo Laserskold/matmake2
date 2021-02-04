@@ -26,8 +26,6 @@ std::vector<std::unique_ptr<Task>> createTree(const MatmakeFile &file,
             }
             auto list = createTree(file, *f);
 
-            //            ret.reserve(ret.size() + list.size());
-
             for (auto &it : list) {
                 ret.push_back(std::move(it));
             }
@@ -37,6 +35,15 @@ std::vector<std::unique_ptr<Task>> createTree(const MatmakeFile &file,
     auto &task = ret.emplace_back(std::make_unique<Task>());
 
     task->name(root.name());
+    if (auto p = root.property("dir")) {
+        task->dir(p->value());
+    }
+    if (auto p = root.property("cxx")) {
+        task->cxx(p->value());
+    }
+    if (auto p = root.property("command")) {
+        task->command(p->value());
+    }
     return ret;
 }
 
