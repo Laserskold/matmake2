@@ -25,8 +25,8 @@ add_library(
 link_libraries(matmake2-core  ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable (
-	matmake2
-        "src/main.cpp"
+   matmake2
+  "src/main/main.cpp"
 )
 
 include_directories(
