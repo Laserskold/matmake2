@@ -1,0 +1,34 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: git submodules
+      run: git submodule update --init
+    - name: install stuff
+      run: sudo apt update && sudo apt-get install ninja-build g++-10
+    - name: create build dir
+      run: mkdir build
+    - name: cmake
+      working-directory: build
+      run: cmake .. -G Ninja
+      shell: bash
+      env:
+        CXX: g++-10
+    - name: ninja
+      working-directory: build
+      run: ninja
+    - name: test
+      run: ctest
+      working-directory: build
+      
