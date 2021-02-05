@@ -22,3 +22,10 @@ Windows
 * Then just use the cmake gui to select the right compiler 
 (doing it with command line is almost impossible)
 
+
+
+Run unit tests
+-----------------------
+Goto build directory.
+
+Run `ctest`.

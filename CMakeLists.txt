@@ -1,6 +1,7 @@
 ﻿# CMakeList.txt : CMake project for Matmake-v2
 cmake_minimum_required (VERSION 3.16)
 
+set(CMAKE_CXX_STANDARD 17)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -time-trace")
@@ -10,25 +11,32 @@ project ("matmake2" CXX)
 
 find_package( Threads )
 
+add_library(
+   matmake2-core
+   STATIC
+   "src/task.cpp"
+   "src/tasklist.cpp"
+   "src/nativecommands.cpp"
+   "src/precompiled.h"
+   "src/targetnode.h"
+   "src/task.h"
+)
+
+link_libraries(matmake2-core  ${CMAKE_THREAD_LIBS_INIT})
+
 add_executable (
 	matmake2
         "src/main.cpp"
-        "src/task.cpp"
-        "src/tasklist.cpp"
-        "src/nativecommands.cpp"
-        "src/precompiled.h"
-	"src/targetnode.h"
-	"src/task.h"
 )
 
+include_directories(
+   "${CMAKE_SOURCE_DIR}/src"
+   "${CMAKE_SOURCE_DIR}/lib/json.h/include"
+   )
 
-target_link_libraries( matmake2 ${CMAKE_THREAD_LIBS_INIT} )
+target_precompile_headers(matmake2-core PUBLIC "src/precompiled.h")
 
-set_property(TARGET matmake2 PROPERTY CXX_STANDARD 17)
-
-include_directories("${CMAKE_SOURCE_DIR}/lib/json.h/include")
-
-target_precompile_headers(matmake2 PUBLIC "src/precompiled.h")
+target_precompile_headers(matmake2 REUSE_FROM matmake2-core)
 
 file (
     COPY
@@ -36,6 +44,13 @@ file (
     DESTINATION
     ${CMAKE_CURRENT_BINARY_DIR}/demos
 )
+
+## ===== Tests =====================================
+
+add_executable (task_test test/task_test.cpp)
+
+enable_testing()
+add_test(NAME tests COMMAND task_test)
 
 
 
