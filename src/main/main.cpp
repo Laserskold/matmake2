@@ -18,6 +18,7 @@ options:
 --verbose -v          print extra information
 -C [dir]              run in another directory
 --target -t [target]  select target (eg g++, clang++, msvc)
+--clean               remove all built file
 
 developer options:
 --tasks [taskfile]    build a task json-file
@@ -28,6 +29,12 @@ developer options:
 
 )_";
 
+enum class Command {
+    Build,
+    ParseTasks,
+    Clean,
+};
+
 struct Settings {
     filesystem::path taskFile;
     filesystem::path matmakeFile = "matmake.json";
@@ -36,6 +43,8 @@ struct Settings {
     bool verbose = false;
     bool skipBuild = false;
     std::string target = "g++";
+
+    Command command = Command::Build;
 
     Settings(int argc, char **argv) {
         std::vector<std::string> args{argv + 1, argv + argc};
@@ -52,6 +61,7 @@ struct Settings {
                 arg = args.at(i);
 
                 taskFile = arg;
+                command = Command::ParseTasks;
             }
             else if (arg == "--print-tasks") {
                 printTasks = true;
@@ -73,6 +83,9 @@ struct Settings {
                 ++i;
                 target = arg.at(i);
             }
+            else if (arg == "--clean") {
+                command = Command::Clean;
+            }
         }
     }
 };
@@ -82,32 +95,36 @@ struct Settings {
 int main(int argc, char **argv) {
     const auto settings = Settings{argc, argv};
 
-    if (!settings.taskFile.empty()) {
-        filesystem::current_path(settings.taskFile.parent_path());
+    switch (settings.command) {
 
-        auto tasks = parseTasks(settings.taskFile.filename());
+    case Command::ParseTasks:
+        if (!settings.taskFile.empty()) {
+            filesystem::current_path(settings.taskFile.parent_path());
 
-        if (settings.printTasks) {
-            printFlat(*tasks);
+            auto tasks = parseTasks(settings.taskFile.filename());
+
+            if (settings.printTasks) {
+                printFlat(*tasks);
+            }
+
+            if (settings.printTree) {
+                std::cout << "\n"
+                             "treeview\n"
+                             "==================\n";
+                auto &root = *tasks->find("@g++");
+                root.print(settings.verbose);
+            }
+
+            std::cout << "building... \n";
+
+            if (!settings.skipBuild) {
+                auto coordinator = Coordinator{};
+
+                coordinator.execute(*tasks);
+            }
         }
-
-        if (settings.printTree) {
-            std::cout << "\n"
-                         "treeview\n"
-                         "==================\n";
-            auto &root = *tasks->find("@g++");
-            root.print(settings.verbose);
-        }
-
-        std::cout << "building... \n";
-
-        if (!settings.skipBuild) {
-            auto coordinator = Coordinator{};
-
-            coordinator.execute(*tasks);
-        }
-    }
-    else {
+        break;
+    case Command::Build: {
         if (!filesystem::exists(settings.matmakeFile)) {
             std::cerr << "no matmakefile found in directory\n";
             return 1;
@@ -139,6 +156,19 @@ int main(int argc, char **argv) {
             auto coordinator = Coordinator{};
             coordinator.execute(tasks);
         }
+    } break;
+    case Command::Clean: {
+        auto json = Json::loadFile(settings.matmakeFile.string());
+
+        auto matmakeFile = MatmakeFile{json};
+
+        auto tasks = createTasks(matmakeFile, settings.target);
+
+        for (auto &task : tasks) {
+            task->clean();
+        }
+
+    } break;
     }
 
     return 0;

@@ -176,6 +176,12 @@ public:
         }
     }
 
+    void generateDepName() {
+        if (!_out.empty()) {
+            _depfile = _out.string() + ".d";
+        }
+    }
+
     void command(std::string command) {
         _command = command;
     }
@@ -332,6 +338,25 @@ public:
 
         if (_state == TaskState::NotCalculated) {
             _state = TaskState::Fresh;
+        }
+    }
+
+    void clean() const {
+        if (_state == TaskState::Raw) {
+            return;
+        }
+
+        {
+            auto d = depfile();
+            if (filesystem::exists(d)) {
+                filesystem::remove(d);
+            }
+        }
+        {
+            auto o = out();
+            if (filesystem::exists(o)) {
+                filesystem::remove(o);
+            }
         }
     }
 

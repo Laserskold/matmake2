@@ -89,9 +89,6 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
                                          " at " + std::string{in->pos}};
             }
             auto tree = createTree(file, *f);
-            //            for (auto &t : list) {
-            //                task.pushIn(t.get());
-            //            }
             task.pushIn(tree.second);
             taskList.insert(std::move(tree.first));
         }
@@ -130,6 +127,8 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
             task.commands(commands);
         }
     }
+
+    task.generateDepName();
 
     return {std::move(taskList), &task};
 }

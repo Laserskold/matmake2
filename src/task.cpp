@@ -2,6 +2,15 @@
 #include "json/json.h"
 #include <iostream>
 
+const std::vector<std::string> stateMap = {
+    "NotCalculated",
+    "Raw", // Input file: nothing to do
+    "Fresh",
+    "DirtyReady",
+    "DirtyWaiting",
+    "Done",
+};
+
 void Task::parse(const Json &jtask) {
     auto jsonFind = [&jtask](std::string name) -> const Json * {
         auto f = jtask.find(name);
@@ -130,6 +139,8 @@ void Task::print(bool verbose, size_t indentation) {
              << "\n";
 
     indent() << "dirty: " << (isDirty() ? "yes" : "no") << "\n";
+
+    indent() << "state: " << stateMap.at(static_cast<int>(_state));
 
     if (verbose) {
         auto commands = this->commands();
