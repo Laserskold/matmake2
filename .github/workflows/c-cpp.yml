@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: install stuff
-      run: apt install ninja-build
+      run: sudo apt-get install ninja-build
     - name: create build dir
       run: mkdir build
     - name: cmake
