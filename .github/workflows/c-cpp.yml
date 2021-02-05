@@ -14,12 +14,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: install stuff
-      run: sudo apt-get install ninja-build
+      run: sudo apt update && sudo apt-get install ninja-build g++-10
     - name: create build dir
       run: mkdir build
     - name: cmake
       working-directory: build
-      run: cmake .. -G Ninja -DUSE_EXPERIMENTAL_FILESYSTEM=1
+      run: cmake .. -G Ninja
+      shell: bash
+      env:
+        CXX: g++-10
     - name: ninja
       working-directory: build
       run: ninja
