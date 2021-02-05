@@ -13,6 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: git submodules
+      run: git submodule update --init
     - name: install stuff
       run: sudo apt update && sudo apt-get install ninja-build g++-10
     - name: create build dir
