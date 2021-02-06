@@ -6,6 +6,9 @@ native::CommandType native::findCommand(std::string name) {
     if (name == "copy") {
         return &copy;
     }
+    if (name == "none") {
+        return [](const Task &) { return native::CommandStatus::Normal; };
+    }
     else {
         return nullptr;
     }

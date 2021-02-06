@@ -1,0 +1,77 @@
+﻿[
+  {
+    "out": "./src/main.cpp"
+  },
+  {
+    "out": "./src/other.cpp"
+  },
+  {
+    "out": "./data/Readme.md"
+  },
+  {
+    "out": "./src/precompiled.hpp"
+  },
+  {
+    "out": "./src/other.h"
+  },
+  {
+    "out": "src/precompiled.hpp.gch",
+    "in": [ "./src/precompiled.hpp" ],
+    "depfile": "src/precompiled.hpp.gch.d",
+    "command": "[gch]"
+  },
+  {
+    "in": [ "./data/Readme.md" ],
+    "out": "Readme.md",
+    "command": "[copy]"
+  },
+  {
+    "src": "src/main.cpp",
+    "in": [ "./src/main.cpp", "src/precompiled.hpp.gch" ],
+    "deps": [ ],
+    "depfile": "src/main.o.d",
+    "out": "src/main.o",
+    "command": "[cxx]"
+  },
+  {
+    "src": "src/other.cpp",
+    "in": [ "./src/other.cpp", "src/precompiled.hpp.gch" ],
+    "deps": [ ],
+    "depfile": "src/other.o.d",
+    "out": "src/other.o",
+    "command": "[cxx]"
+  },
+  {
+    "name": "main",
+    "in": [ "src/main.o", "src/other.o" ],
+    "out": "main.exe",
+    "flags": "-Wall",
+    "type": "exe",
+    "includes": [
+      "include"
+    ],
+    "sysincludes": [
+      "bla"
+    ],
+    "command": "[exe]"
+  },
+  {
+    "name": "all",
+    "in": [ "@main", "./data/Readme.md" ],
+    "config": [
+      "c++17"
+    ]
+  },
+  {
+    "name": "g++",
+    "in": [ "@all" ],
+    "dir": "build/g++",
+    "cxxflags": "-Wall -Wpedantic -Wextra",
+    "c++": "g++",
+    "commands": {
+      "cxx": "{c++} {in} -o {out} -c -MD -MF {depfile} {cxxflags} {flags} {includes}",
+      "exe": "{c++} {in} -o {out} {ldflags} {includes}",
+      "gch": "{c++} {in} -o {out} -MD -MF {depfile} {cxxflags} {flags} {includes}"
+    }
+  }
+]

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -40,6 +41,21 @@ public:
         for (auto s : segments) {
             if (s.isReference) {
                 ss << task.property(s.value);
+            }
+            else {
+                ss << s.value;
+            }
+        }
+
+        return ss.str();
+    }
+
+    std::string expand(const std::map<std::string, std::string> values) {
+        std::ostringstream ss;
+
+        for (auto s : segments) {
+            if (s.isReference) {
+                ss << values.at(s.value);
             }
             else {
                 ss << s.value;

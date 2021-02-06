@@ -109,3 +109,26 @@ void printFlat(const TaskList &list) {
         }
     }
 }
+
+void createDirectories(const TaskList &tasks) {
+
+    auto directories = std::map<filesystem::path, int>{};
+
+    for (auto &task : tasks) {
+        ++directories[task->out().parent_path()];
+    }
+
+    for (auto &it : directories) {
+        if (it.first.empty()) {
+            continue;
+        }
+        else if (!filesystem::exists(it.first)) {
+            filesystem::create_directories(it.first);
+        }
+        else if (!filesystem::is_directory(it.first)) {
+            throw std::runtime_error{"expected " + it.first.string() +
+                                     " to be a directory "
+                                     "but it is a file"};
+        }
+    }
+}

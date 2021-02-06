@@ -41,6 +41,22 @@ struct Property {
         return values.front();
     }
 
+    std::string concat() const {
+        if (values.empty()) {
+            return {};
+        }
+
+        std::ostringstream ss;
+        for (auto &value : values) {
+            ss << value << " ";
+        }
+
+        auto str = ss.str();
+
+        str.pop_back();
+        return str;
+    }
+
     friend std::ostream &operator<<(std::ostream &stream, const Property prop) {
         if (prop.values.empty())
             ;

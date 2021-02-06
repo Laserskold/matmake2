@@ -1,9 +1,13 @@
 #pragma once
 
 #include "matmakefile.h"
+#include "prescan.h"
+#include "sourcetype.h"
 #include "task.h"
 #include "tasklist.h"
 #include <memory>
+
+namespace task {
 
 std::vector<filesystem::path> expandPaths(filesystem::path expression) {
     auto filename = expression.filename().string();
@@ -13,8 +17,6 @@ std::vector<filesystem::path> expandPaths(filesystem::path expression) {
         auto ending = filename.substr(f + 1);
 
         auto ret = std::vector<filesystem::path>{};
-        //        for (auto it : filesystem::recursive_directory_iterator{"."})
-        //        {
         for (auto it : filesystem::directory_iterator{"." / dir}) {
             if (it.path() == "." || it.path() == "..") {
                 continue;
@@ -25,12 +27,12 @@ std::vector<filesystem::path> expandPaths(filesystem::path expression) {
             auto fn = path.filename().string();
 
             if (!beginning.empty()) {
-                if (fn.find(beginning) == std::string::npos) {
+                if (fn.find(beginning) != 0) {
                     continue;
                 }
             }
             if (!ending.empty()) {
-                if (fn.find(ending) == std::string::npos) {
+                if (fn.find(ending) != fn.size() - ending.size()) {
                     continue;
                 }
             }
@@ -46,9 +48,20 @@ std::vector<filesystem::path> expandPaths(filesystem::path expression) {
 
 //! The last item is the one that is expected to be linked to
 TaskList createTaskFromPath(filesystem::path path) {
-    TaskList ret;
+    auto ret = TaskList{};
 
-    if (path.extension() == ".cpp") {
+    auto type = SourceType{};
+
+    try {
+        type = sourceTypeMap.at(path.extension());
+    }
+    catch (...) {
+        throw std::runtime_error{"unknown file ending: " + path.string()};
+    }
+
+    if (false) { //  without prescan
+                 //    switch (type) {
+                 //    case SourceType::CxxSource: {
         auto &source = ret.emplace();
 
         source.out("." / path);
@@ -62,7 +75,46 @@ TaskList createTaskFromPath(filesystem::path path) {
         task.command("[cxx]");
 
         task.depfile(path.string() + ".d");
+        //    } break;
+        //    case SourceType::ModuleSource: {
     }
+    else {
+
+        auto &source = ret.emplace();
+
+        source.out("." / path);
+
+        auto &expandedSource = ret.emplace();
+
+        expandedSource.pushIn(&source);
+
+        // Note that the source actually is version of the source file that is
+        // expanded by the precompiler
+        expandedSource.out(path.string() + ".eem");
+
+        expandedSource.command("[none]");
+
+        auto &precompiledModule = ret.emplace();
+
+        precompiledModule.pushIn(&expandedSource);
+
+        precompiledModule.out(path.string() + ".pcm");
+
+        precompiledModule.depfile(path.string() + ".pcm.d");
+
+        precompiledModule.command("[pcm]");
+
+        auto &task = ret.emplace();
+
+        task.pushIn(&precompiledModule);
+
+        task.out(path.string() + ".o");
+
+        task.command("[cxxm]");
+    }
+
+    //    } break;
+    //    }
 
     return ret;
 }
@@ -120,6 +172,9 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
     if (auto p = root.property("out")) {
         task.out(p->value());
     }
+    if (auto p = root.property("flags")) {
+        task.flags(p->concat());
+    }
     {
         auto &commands = root.ocommands();
 
@@ -133,12 +188,15 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
     return {std::move(taskList), &task};
 }
 
+} // namespace task
+
 TaskList createTasks(const MatmakeFile &file, std::string rootName) {
     for (auto &node : file.nodes()) {
         if (auto command = node.property("command")) {
             if (command->value() == "[root]") {
                 if (node.name() == rootName) {
-                    auto tasks = createTree(file, node).first;
+                    auto tasks = task::createTree(file, node).first;
+                    prescan(tasks);
                     calculateState(tasks);
                     return tasks;
                 }

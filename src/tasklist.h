@@ -93,6 +93,8 @@ struct TaskList {
     }
 };
 
+void createDirectories(const TaskList &tasks);
+
 std::unique_ptr<TaskList> parseTasks(filesystem::path path);
 
 void calculateState(TaskList &list);

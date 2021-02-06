@@ -29,3 +29,8 @@ Run unit tests
 Goto build directory.
 
 Run `ctest`.
+
+
+For more information about c++20 modules (in clang)
+
+https://clang.llvm.org/docs/Modules.html

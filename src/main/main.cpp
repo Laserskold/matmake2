@@ -81,7 +81,7 @@ struct Settings {
             }
             else if (arg == "--target" || arg == "-t") {
                 ++i;
-                target = arg.at(i);
+                target = args.at(i);
             }
             else if (arg == "--clean") {
                 command = Command::Clean;
@@ -147,8 +147,14 @@ int main(int argc, char **argv) {
             std::cout << "\n"
                          "treeview\n"
                          "==================\n";
-            auto &root = *tasks.find("@g++");
-            root.print(settings.verbose);
+            auto root = tasks.find("@" + settings.target);
+
+            if (!root) {
+                throw std::runtime_error{"could not find target " +
+                                         settings.target};
+            }
+
+            root->print(settings.verbose);
             std::cout.flush();
         }
 

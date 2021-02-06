@@ -49,6 +49,9 @@ void Task::parse(const Json &jtask) {
     if (auto f = jsonFind("c++")) {
         cxx(f->string());
     }
+    if (auto f = jsonFind("flags")) {
+        flags(f->string());
+    }
     //    if (auto f = jsonFind("in")) {
     //        if (f->type == Json::Array) {
     //            _rawIn.reserve(f->size());
@@ -79,6 +82,7 @@ Json Task::dump() {
     attachValue("depfile", _depfile.string());
     attachValue("command", _command);
     attachValue("cxx", _cxx.string());
+    attachValue("flags", _flags);
 
     if (!_in.empty()) {
         auto &j = json["in"];
@@ -141,6 +145,13 @@ void Task::print(bool verbose, size_t indentation) {
     indent() << "dirty: " << (isDirty() ? "yes" : "no") << "\n";
 
     indent() << "state: " << stateMap.at(static_cast<int>(_state));
+
+    {
+        auto flags = this->flags();
+        if (!flags.empty()) {
+            indent() << "flags: " << flags;
+        }
+    }
 
     if (verbose) {
         auto commands = this->commands();

@@ -160,6 +160,9 @@ public:
         else if (name == "c++") {
             return cxx().string();
         }
+        else if (name == "flags") {
+            return flags();
+        }
         return {};
     }
 
@@ -292,6 +295,24 @@ public:
         }
     }
 
+    std::string flags() const {
+        if (_flags.empty()) {
+            if (_parent) {
+                return _parent->flags();
+            }
+            else {
+                return {};
+            }
+        }
+        else {
+            return _flags;
+        }
+    }
+
+    void flags(std::string flags) {
+        _flags = flags;
+    }
+
     // Todo: This needs some unit tests
     void updateState() {
         if (_state != TaskState::NotCalculated) {
@@ -309,10 +330,6 @@ public:
             return;
         }
 
-        if (!_out.empty() && !exists()) {
-            _state = TaskState::DirtyReady;
-        }
-
         for (auto &in : _in) {
             if (in->state() == TaskState::Raw) {
                 if (in->changedTime() > changedTime()) {
@@ -327,6 +344,11 @@ public:
                 _state = TaskState::DirtyReady;
                 return;
             }
+        }
+
+        if (!_out.empty() && !exists()) {
+            _state = TaskState::DirtyReady;
+            return;
         }
 
         for (auto &trigger : _triggers) {
@@ -374,8 +396,7 @@ private:
     std::string _name;                            // If empty-same as out
     std::string _command;                         // If empty use parents
     std::map<std::string, std::string> _commands; // Parents build command
-    //    std::vector<std::string> _rawIn;              // string name of inputs
-    //    std::vector<std::string> _rawTriggers;        // same but for triggers
+    std::string _flags;
 
     // Fixed during connection step
     std::vector<Task *> _in; // Files that needs to be built before this file
