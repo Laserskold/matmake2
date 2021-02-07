@@ -4,93 +4,9 @@
 #include "createtasks.h"
 #include "filesystem.h"
 #include "matmakefile.h"
+#include "settings.h"
 #include "tasklist.h"
 #include "json/json.h"
-
-namespace {
-
-const std::string helpText = R"_(
-usage:
-matmake2 [options]
-
-options:
---help -h             print this text
---verbose -v          print extra information
--C [dir]              run in another directory
---target -t [target]  select target (eg g++, clang++, msvc)
---clean               remove all built file
-
-developer options:
---tasks [taskfile]    build a task json-file
---dry-run             only parse matmake file and dump tasklist
---print-tree          print dependency tree
---print-tasks         print list of tasks
-
-
-)_";
-
-enum class Command {
-    Build,
-    ParseTasks,
-    Clean,
-};
-
-struct Settings {
-    filesystem::path taskFile;
-    filesystem::path matmakeFile = "matmake.json";
-    bool printTree = false;
-    bool printTasks = false;
-    bool verbose = false;
-    bool skipBuild = false;
-    std::string target = "g++";
-
-    Command command = Command::Build;
-
-    Settings(int argc, char **argv) {
-        std::vector<std::string> args{argv + 1, argv + argc};
-
-        for (size_t i = 0; i < args.size(); ++i) {
-            auto arg = args.at(i);
-
-            if (arg == "-h" || arg == "--help") {
-                std::cout << helpText;
-                std::exit(0);
-            }
-            else if (arg == "--tasks") {
-                ++i;
-                arg = args.at(i);
-
-                taskFile = arg;
-                command = Command::ParseTasks;
-            }
-            else if (arg == "--print-tasks") {
-                printTasks = true;
-            }
-            else if (arg == "--print-tree") {
-                printTree = true;
-            }
-            else if (arg == "--verbose" || arg == "-v") {
-                verbose = true;
-            }
-            else if (arg == "-C") {
-                ++i;
-                filesystem::current_path(args.at(i));
-            }
-            else if (arg == "--dry-run") {
-                skipBuild = true;
-            }
-            else if (arg == "--target" || arg == "-t") {
-                ++i;
-                target = args.at(i);
-            }
-            else if (arg == "--clean") {
-                command = Command::Clean;
-            }
-        }
-    }
-};
-
-} // namespace
 
 int main(int argc, char **argv) {
     const auto settings = Settings{argc, argv};
@@ -120,7 +36,16 @@ int main(int argc, char **argv) {
             if (!settings.skipBuild) {
                 auto coordinator = Coordinator{};
 
-                coordinator.execute(*tasks);
+                auto status = coordinator.execute(*tasks, settings);
+
+                if (status) {
+                    std::cout << "failed...\n";
+                }
+                else {
+                    std::cout << "done...\n";
+                }
+
+                return status;
             }
         }
         break;
@@ -160,7 +85,16 @@ int main(int argc, char **argv) {
 
         if (!settings.skipBuild) {
             auto coordinator = Coordinator{};
-            coordinator.execute(tasks);
+            auto status = coordinator.execute(tasks, settings);
+
+            if (status) {
+                std::cout << "failed...\n";
+            }
+            else {
+                std::cout << "done...\n";
+            }
+
+            return status;
         }
     } break;
     case Command::Clean: {

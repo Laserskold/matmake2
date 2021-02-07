@@ -1,7 +1,10 @@
 Matmake2
 ============================
 
-Linux
+
+
+
+Building on Linux
 ------------------
 
 ### Using cmake
@@ -34,3 +37,7 @@ Run `ctest`.
 For more information about c++20 modules (in clang)
 
 https://clang.llvm.org/docs/Modules.html
+
+
+## Todo
+- [ ] Automatically parse visual studio debug console environment variables before build

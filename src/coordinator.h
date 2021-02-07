@@ -2,6 +2,7 @@
 
 #include "filesystem.h"
 #include "nativecommands.h"
+#include "settings.h"
 #include "tasklist.h"
 #include <iostream>
 #include <map>
@@ -23,9 +24,10 @@ public:
         Failed,
     };
 
-    RunStatus run(std::string command) {
-        std::cout << ("running " + command + "\n");
-        std::cout.flush();
+    RunStatus run(std::string command, bool verbose) {
+        std::cout << command << std::endl;
+        //        std::cout << ("running " + command + "\n");
+        //        std::cout.flush();
         if (std::system(command.c_str())) {
             return RunStatus::Failed;
         }
@@ -34,7 +36,8 @@ public:
         }
     }
 
-    void execute(TaskList &tasks) {
+    // Returns true on error
+    bool execute(TaskList &tasks, const Settings &settings) {
         using namespace std::chrono_literals;
         _status = CoordinatorStatus::Running;
 
@@ -57,22 +60,31 @@ public:
         createDirectories(tasks);
 
         if (_todo.empty()) {
-            throw std::runtime_error{
-                "cannot build anything. No task is possible to build\n"};
+            //            throw std::runtime_error{
+            //                "Nothing to do\n"};
+
+            std::cout << "Nothing to do...\n";
+            return false;
         }
 
         workers.reserve(nThreads);
         for (size_t i = 0; i < nThreads; ++i) {
-            workers.emplace_back([this, i] {
-                std::cout << "starting thread " << i << "\n";
+            workers.emplace_back([this, i, &settings] {
+                if (settings.debugPrint) {
+                    std::cout
+                        << ("starting thread " + std::to_string(i) + "\n");
+                }
                 while (_status == CoordinatorStatus::Running) {
                     if (auto task = popTask()) {
                         auto out = task->out();
                         if (out.empty()) {
-                            std::cout
-                                << " do not build task " << task->name()
-                                << " because no output files is specified\n";
-                            pushFinished(task);
+                            if (settings.debugPrint) {
+                                std::cout << " do not build task "
+                                          << task->name()
+                                          << " because no output files is "
+                                             "specified\n";
+                            }
+                            pushFinished(task, settings.verbose);
                             continue;
                         }
 
@@ -83,7 +95,7 @@ public:
                                 _status = CoordinatorStatus::Failed;
                             }
                             else {
-                                pushFinished(task);
+                                pushFinished(task, settings.verbose);
                             }
                         }
                         else {
@@ -91,11 +103,12 @@ public:
                                 ProcessedCommand{rawCommand}.expand(*task);
 
                             if (!command.empty()) {
-                                if (run(command) == RunStatus::Failed) {
+                                if (run(command, settings.verbose) ==
+                                    RunStatus::Failed) {
                                     _status = CoordinatorStatus::Failed;
                                 }
                                 else {
-                                    pushFinished(task);
+                                    pushFinished(task, settings.verbose);
                                 }
                             }
                         }
@@ -134,9 +147,9 @@ public:
         for (auto &worker : workers) {
             worker.join();
         }
-    }
 
-    void handleSubscribers() {}
+        return _status != CoordinatorStatus::Done;
+    }
 
     [[nodiscard]] Task *popTask() {
         auto lock = std::scoped_lock{_todoMutex};
@@ -156,9 +169,12 @@ public:
         _todo.push_back(task);
     }
 
-    void pushFinished(Task *task) {
+    void pushFinished(Task *task, bool verbose) {
         auto lock = std::scoped_lock{_subscriberMutex};
-        std::cout << "task " + task->name() + " finished" << std::endl;
+
+        if (verbose) {
+            std::cout << "task " + task->name() + " finished" << std::endl;
+        }
         _finished.push_back(task);
     }
 

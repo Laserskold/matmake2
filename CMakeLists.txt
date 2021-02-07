@@ -20,6 +20,8 @@ add_library(
    "src/precompiled.h"
    "src/targetnode.h"
    "src/task.h"
+   "src/settings.cpp"
+   "src/settings.h"
 )
 
 link_libraries(matmake2-core  ${CMAKE_THREAD_LIBS_INIT})

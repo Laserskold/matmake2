@@ -3,5 +3,5 @@
 #include "other.h"
 
 int main() {
-    std::cout << other();
+    std::cout << other() << "\n";
 }

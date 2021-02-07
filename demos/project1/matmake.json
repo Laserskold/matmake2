@@ -2,7 +2,7 @@
   {
     "name": "main",
     "out": "main.exe",
-    "flags": "{+} -Wall",
+    "flags": "{parent.flags} -Wall",
     "pch" : [ "include/precompiled.hpp" ],
     "src": [ "src/*.cpp", "src/*.cppm" ],
     "copy": [
@@ -37,10 +37,10 @@
     "dir": "build/g++",
     "command": "[root]",
     "commands": {
-      "cxx": "{c++} {in} -o {out} -c -MD -MF {depfile} {cxxflags} {flags} {includes}",
+      "cxx": "{c++} -x c++ {src} -o {out} -c -MD -MF {depfile} {cxxflags} {flags} {includes}",
       "exe": "{c++} {in} -o {out} {ldflags} {includes}",
-      "gch": "{c++} {in} -o {out} -MD -MF {depfile} {cxxflags} {flags} {includes}",
-      "eem": "{c++} {in} -E -o {out}"
+      "gch": "{c++} {src} -o {out} -MD -MF {depfile} {cxxflags} {flags} {includes}",
+      "eem": "{c++} {src} -E -o {out}"
     }
   },
   {

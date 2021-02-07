@@ -50,21 +50,6 @@ public:
         return ss.str();
     }
 
-    std::string expand(const std::map<std::string, std::string> values) {
-        std::ostringstream ss;
-
-        for (auto s : segments) {
-            if (s.isReference) {
-                ss << values.at(s.value);
-            }
-            else {
-                ss << s.value;
-            }
-        }
-
-        return ss.str();
-    }
-
 private:
     struct Segment {
         std::string value;

@@ -47,7 +47,7 @@ std::vector<filesystem::path> expandPaths(filesystem::path expression) {
 }
 
 //! The last item is the one that is expected to be linked to
-TaskList createTaskFromPath(filesystem::path path) {
+TaskList createTaskFromPath(filesystem::path path, bool useModules = true) {
     auto ret = TaskList{};
 
     auto type = SourceType{};
@@ -59,9 +59,7 @@ TaskList createTaskFromPath(filesystem::path path) {
         throw std::runtime_error{"unknown file ending: " + path.string()};
     }
 
-    if (false) { //  without prescan
-                 //    switch (type) {
-                 //    case SourceType::CxxSource: {
+    if (!useModules) {
         auto &source = ret.emplace();
 
         source.out("." / path);
@@ -75,11 +73,8 @@ TaskList createTaskFromPath(filesystem::path path) {
         task.command("[cxx]");
 
         task.depfile(path.string() + ".d");
-        //    } break;
-        //    case SourceType::ModuleSource: {
     }
     else {
-
         auto &source = ret.emplace();
 
         source.out("." / path);
@@ -126,9 +121,6 @@ TaskList createTaskFromPath(filesystem::path path) {
             task.command("[cxx]");
         }
     }
-
-    //    } break;
-    //    }
 
     return ret;
 }

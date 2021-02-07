@@ -11,6 +11,7 @@
 struct PrescanResult {
     std::string name;
     std::vector<std::string> imports;
+    std::vector<std::string> includes;
 };
 
 // Load in parsed information from prescaned file if it exist and is newer than
@@ -35,12 +36,18 @@ std::optional<PrescanResult> parsePrescanResults(filesystem::path expandedFile,
         result.name = f->string();
     }
 
-    const auto &in = json["in"];
+    if (auto f = json.find("modules"); f != json.end()) {
+        result.imports.reserve(f->size());
+        for (auto &j : json["modules"]) {
+            result.imports.push_back(j.string());
+        }
+    }
 
-    result.imports.reserve(in.size());
-
-    for (auto &j : json["in"]) {
-        result.imports.push_back(j.string());
+    if (auto f = json.find("include"); f != json.end()) {
+        result.includes.reserve(f->size());
+        for (auto &j : *f) {
+            result.includes.push_back(j.string());
+        }
     }
 
     return result;
@@ -62,7 +69,12 @@ PrescanResult parseExpandedFile(filesystem::path expandedFile,
 
     auto ret = PrescanResult{};
 
+    std::map<std::string, size_t> includes;
+
     for (std::string line; getline(file, line);) {
+        if (line.empty()) {
+            continue;
+        }
         if (line.rfind(importStatement, 0) == 0) {
             if (auto f = line.find(';'); f != std::string::npos) {
                 ret.imports.push_back(
@@ -75,9 +87,31 @@ PrescanResult parseExpandedFile(filesystem::path expandedFile,
                             line.begin() + f};
             }
         }
+        else if (line.front() == '#' && line.size() > 4 && line[2] >= '0' &&
+                 line[2] <= '9') {
+            // Example
+            // # 790 "./include/hello.h" 3
+            if (auto f = line.find('"'); f != std::string::npos) {
+                auto f2 = line.rfind('"');
+
+                if (f2 > f) {
+                    auto include =
+                        std::string{line.begin() + f + 1, line.begin() + f2};
+                    if (include.front() != '<') {
+                        if (include.front() != '/') { // Ignore system includes
+                            ++includes[include];
+                        }
+                    }
+                }
+            }
+        }
     }
 
     file.close();
+
+    for (auto &i : includes) {
+        ret.includes.push_back(i.first);
+    }
 
     auto json = Json{Json::Object};
 
@@ -85,12 +119,24 @@ PrescanResult parseExpandedFile(filesystem::path expandedFile,
         json["name"] = ret.name;
     }
 
-    auto &inJson = json["in"];
+    {
+        auto &inJson = json["modules"];
 
-    inJson.type = Json::Array;
+        inJson.type = Json::Array;
 
-    for (auto &in : ret.imports) {
-        inJson.push_back(Json{}.string(in));
+        for (auto &in : ret.imports) {
+            inJson.push_back(Json{}.string(in));
+        }
+    }
+
+    {
+        auto &impJson = json["include"];
+
+        impJson = Json::Array;
+
+        for (auto &imp : ret.includes) {
+            impJson.push_back(Json{}.string(imp));
+        }
     }
 
     std::ofstream{jsonFile} << json;
@@ -133,8 +179,6 @@ void prescan(TaskList &list) {
         if (auto t = getType(task->out());
             t == SourceType::ExpandedModuleSource) {
             auto prescanResult = prescan(*task);
-
-            //            task->parent()->name(prescanResult.name);
 
             auto pcm = task->parent();
 

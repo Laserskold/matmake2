@@ -143,7 +143,12 @@ public:
     }
 
     std::string property(std::string name) const {
-        if (name == "command") {
+        if (name.rfind("parent.") == 0) {
+            if (_parent) {
+                return _parent->property(name.substr(7));
+            }
+        }
+        else if (name == "command") {
             return _command;
         }
         else if (name == "out") {

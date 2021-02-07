@@ -3,5 +3,5 @@
 import other;
 
 int main() {
-    std::cout << other();
+    std::cout << other() << "\n";
 }
