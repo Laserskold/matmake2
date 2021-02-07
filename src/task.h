@@ -2,6 +2,7 @@
 
 #include "filesystem.h"
 #include "processedcommand.h"
+#include "sourcetype.h"
 #include <algorithm>
 #include <chrono>
 #include <map>
@@ -157,11 +158,19 @@ public:
         else if (name == "in") {
             return concatIn();
         }
+        else if (name == "src") {
+            if (!_in.empty()) {
+                return _in.front()->out();
+            }
+        }
         else if (name == "c++") {
             return cxx().string();
         }
         else if (name == "flags") {
             return flags();
+        }
+        else if (name == "modules") {
+            return modulesString();
         }
         return {};
     }
@@ -219,7 +228,10 @@ public:
 
     // Get a single command from the commands-list
     std::string commandAt(std::string name) const {
-        if (auto f = _commands.find(name); f != _commands.end()) {
+        if (name == "none") {
+            return "";
+        }
+        else if (auto f = _commands.find(name); f != _commands.end()) {
             return f->second;
         }
         else if (_parent) {
@@ -273,6 +285,22 @@ public:
                 _state = TaskState::DirtyReady;
             }
         }
+    }
+
+    bool isModule() {
+        return getType(_out) == SourceType::PrecompiledModule;
+    }
+
+    std::string modulesString() const {
+        std::ostringstream ss;
+
+        for (auto &in : in()) {
+            if (in->isModule()) {
+                ss << "-fmodule-file=" << in->out();
+            }
+        }
+
+        return ss.str();
     }
 
     std::vector<Task *> subscribers() {

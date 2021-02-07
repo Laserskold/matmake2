@@ -144,12 +144,12 @@ void Task::print(bool verbose, size_t indentation) {
 
     indent() << "dirty: " << (isDirty() ? "yes" : "no") << "\n";
 
-    indent() << "state: " << stateMap.at(static_cast<int>(_state));
+    indent() << "state: " << stateMap.at(static_cast<int>(_state)) << "\n";
 
     {
         auto flags = this->flags();
         if (!flags.empty()) {
-            indent() << "flags: " << flags;
+            indent() << "flags: " << flags << "\n";
         }
     }
 

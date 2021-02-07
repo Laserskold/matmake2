@@ -88,29 +88,43 @@ TaskList createTaskFromPath(filesystem::path path) {
 
         expandedSource.pushIn(&source);
 
-        // Note that the source actually is version of the source file that is
-        // expanded by the precompiler
         expandedSource.out(path.string() + ".eem");
 
         expandedSource.command("[none]");
 
-        auto &precompiledModule = ret.emplace();
+        if (getType(path) == SourceType::ModuleSource) {
 
-        precompiledModule.pushIn(&expandedSource);
+            auto &precompiledModule = ret.emplace();
 
-        precompiledModule.out(path.string() + ".pcm");
+            precompiledModule.pushIn(&expandedSource);
 
-        precompiledModule.depfile(path.string() + ".pcm.d");
+            auto precompiledPath = path;
+            precompiledPath.replace_extension(".pcm");
 
-        precompiledModule.command("[pcm]");
+            precompiledModule.out(precompiledPath);
 
-        auto &task = ret.emplace();
+            precompiledModule.depfile(precompiledPath.string() + ".pcm.d");
 
-        task.pushIn(&precompiledModule);
+            precompiledModule.command("[pcm]");
 
-        task.out(path.string() + ".o");
+            auto &task = ret.emplace();
 
-        task.command("[cxxm]");
+            task.pushIn(&precompiledModule);
+
+            task.out(precompiledPath.string() + ".o");
+
+            task.command("[cxxm]");
+        }
+        else {
+            // No precompilation step is needed for ordinary cpp-files
+            auto &task = ret.emplace();
+
+            task.pushIn(&expandedSource);
+
+            task.out(path.string() + ".o");
+
+            task.command("[cxx]");
+        }
     }
 
     //    } break;

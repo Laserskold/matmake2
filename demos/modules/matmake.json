@@ -32,17 +32,17 @@
   {
     "name": "clang",
     "in": [ "@all" ],
-    "cxx": "clang++-10",
+    "cxx": "clang++-11",
     "dir": "build/clang",
-    "flags": [ "-fmodules-ts" ],
+    "flags": [ "-fmodules-ts", "-std=c++2a" ],
     "command": "[root]",
     "commands": {
-      "cxx": "{c++} {in} -o {out} -c -MD -MF {depfile} {cxxflags} {flags} {includes}",
-      "cxxm": "{c++} {in} -o {out} -fprebuilt-module-path={dir}/src -c {cxxflags} {flags} {includes}",
+      "cxx": "{c++} -x c++ {src} {modules} -o {out} -c -MD -MF {depfile} {cxxflags} {flags} {includes}",
       "exe": "{c++} {in} -o {out} {ldflags} {includes}",
       "gch": "{c++} {in} -o {out} -MD -MF {depfile} {cxxflags} {flags} {includes}",
-      "pcm": "{c++} --precompile -x c++ {in} -o {out} -c -MD -MF {depfile} {cxxflags} {flags} {includes}",
-      "eem": "{c++} {in} {includes} -E > {out}"
+      "eem": "{c++} {in} {includes} -E > {out}",
+      "pcm": "{c++} {cxxflags} {flags} {includes} {modules} --precompile -x c++-module {src} -o {out} ",
+      "cxxm": "{c++} {cxxflags} {flags} {includes} -c {in} -o {out} "
     }
   },
   {

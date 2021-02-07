@@ -5,6 +5,7 @@
 #include "sourcetype.h"
 #include "tasklist.h"
 #include "json/json.h"
+#include <iostream>
 #include <optional>
 
 struct PrescanResult {
@@ -106,14 +107,9 @@ PrescanResult prescan(Task &task) {
         return std::move(*p);
     }
 
-    //    auto values = std::map<std::string, std::string>{
-    //        {"c++", task.cxx()},
-    //        {"in", source},
-    //        {"out", expandedFile},
-    //    };
-
-    //    auto command = ProcessedCommand{task.commandAt("eem")}.expand(values);
     auto command = ProcessedCommand{task.commandAt("eem")}.expand(task);
+
+    std::cout << "prescanning with: " << command << "\n";
 
     if (system(command.c_str())) {
         throw std::runtime_error{"failed to prescan " + task.out().string() +
@@ -138,17 +134,21 @@ void prescan(TaskList &list) {
             t == SourceType::ExpandedModuleSource) {
             auto prescanResult = prescan(*task);
 
-            task->name(prescanResult.name);
+            //            task->parent()->name(prescanResult.name);
+
+            auto pcm = task->parent();
+
+            pcm->name(prescanResult.name);
 
             for (auto &in : prescanResult.imports) {
-                connections.push_back({task.get(), in});
+                connections.push_back({pcm, in});
             }
         }
     }
 
     //! All files must be prescanned before this can happend
     for (auto &pair : connections) {
-        auto inTask = list.find(pair.second);
+        auto inTask = list.find("@" + pair.second);
         pair.first->pushIn(inTask);
     }
 }
