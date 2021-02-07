@@ -317,6 +317,9 @@ public:
     }
 
     TimePoint changedTime() {
+        if (!_isChangedTimeCurrent) {
+            updateChangedTime();
+        }
         return _changedTime;
     }
 
@@ -331,6 +334,10 @@ public:
     bool isDirty() {
         updateState();
         return _state != TaskState::Fresh && _state != TaskState::Raw;
+    }
+
+    void setState(TaskState state) {
+        _state = state;
     }
 
     // Let this task know that one of its in-tasks is ready
@@ -378,6 +385,7 @@ public:
         else {
             _changedTime = {};
         }
+        _isChangedTimeCurrent = true;
     }
 
     std::string flags() const {
@@ -398,6 +406,17 @@ public:
         _flags = flags;
     }
 
+    //! Remove triggers that is raw or fresh
+    void pruneTriggers() {
+        auto it =
+            std::remove_if(_triggers.begin(), _triggers.end(), [](auto &x) {
+                return x->state() == TaskState::Fresh ||
+                       x->state() == TaskState::Raw;
+            });
+
+        _triggers.erase(it, _triggers.end());
+    }
+
     // Todo: This needs some unit tests
     void updateState() {
         if (_state != TaskState::NotCalculated) {
@@ -407,15 +426,19 @@ public:
         updateChangedTime();
 
         if (_in.empty()) {
-            if (_changedTime == TimePoint{}) {
+            if (!exists()) {
                 throw std::runtime_error{"input file " + out().string() +
                                          " not found"};
             }
             _state = TaskState::Raw;
+            for (auto &t : _triggers) {
+                t->subscribtionNotice(this);
+            }
             return;
         }
 
         for (auto &in : _in) {
+            in->updateState();
             if (in->state() == TaskState::Raw) {
                 if (in->changedTime() > changedTime()) {
                     _state = TaskState::DirtyReady;
@@ -492,5 +515,6 @@ private:
     std::vector<Task *> _triggers; // Files that mark this task as dirty
     std::vector<Task *> _subscribers;
     TimePoint _changedTime;
+    bool _isChangedTimeCurrent = false;
     TaskState _state = TaskState::NotCalculated;
 };

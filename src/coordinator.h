@@ -108,6 +108,7 @@ public:
                                     _status = CoordinatorStatus::Failed;
                                 }
                                 else {
+                                    task->setState(TaskState::Done);
                                     pushFinished(task, settings.verbose);
                                 }
                             }

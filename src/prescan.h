@@ -98,7 +98,11 @@ PrescanResult parseExpandedFile(filesystem::path expandedFile,
                     auto include =
                         std::string{line.begin() + f + 1, line.begin() + f2};
                     if (include.front() != '<') {
-                        if (include.front() != '/') { // Ignore system includes
+                        auto type = getType(include);
+                        if (include.front() != '/' &&
+                            (type == SourceType::Header ||
+                             type == SourceType::CxxHeader)) { // Ignore system
+                                                               // includes
                             ++includes[include];
                         }
                     }

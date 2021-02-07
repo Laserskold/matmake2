@@ -36,6 +36,7 @@
     "dir": "build/clang",
     "flags": [ "-fmodules-ts", "-std=c++2a" ],
     "command": "[root]",
+    "includeprefix": "-I",
     "commands": {
       "cxx": "{c++} -x c++ {src} {modules} -o {out} -c -MD -MF {depfile} {cxxflags} {flags} {includes}",
       "exe": "{c++} {in} -o {out} {ldflags} {includes}",

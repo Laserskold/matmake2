@@ -58,13 +58,16 @@ void calculateState(TaskList &list) {
             continue;
         }
         for (auto &f : parseDepFile(depfile).deps) {
-            //            task->pushTrigger(list.find(f.string()));
             task->pushIn(list.find(f.string()));
         }
     }
 
     for (auto &task : list) {
         task->updateState();
+    }
+
+    for (auto &task : list) {
+        task->pruneTriggers();
     }
 }
 
