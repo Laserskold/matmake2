@@ -52,19 +52,6 @@ void Task::parse(const Json &jtask) {
     if (auto f = jsonFind("flags")) {
         flags(f->string());
     }
-    //    if (auto f = jsonFind("in")) {
-    //        if (f->type == Json::Array) {
-    //            _rawIn.reserve(f->size());
-    //            for (auto &j : *f) {
-    //                _rawIn.push_back(j.value);
-    //            }
-    //        }
-    //        else {
-    //            throw std::runtime_error{"wrong type for 'in', expected array
-    //            " +
-    //                                     std::string{f->pos}};
-    //        }
-    //    }
 }
 
 Json Task::dump() {

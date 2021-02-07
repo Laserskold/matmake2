@@ -71,6 +71,7 @@ public:
         }
         if (std::find(_in.begin(), _in.end(), in) == _in.end()) {
             _in.push_back(in);
+            _triggers.push_back(in);
             in->parent(this);
             in->addSubscriber(this);
         }

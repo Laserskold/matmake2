@@ -33,7 +33,8 @@ void connectTasks(TaskList &list, const Json &json) {
                 for (auto &value : *f) {
                     auto ftask = list.find(value.string());
                     if (ftask) {
-                        task.pushTrigger(ftask);
+                        //                        task.pushTrigger(ftask);
+                        task.pushIn(ftask);
                     }
                     else {
                         throw std::runtime_error{"could not find task " +
@@ -57,7 +58,8 @@ void calculateState(TaskList &list) {
             continue;
         }
         for (auto &f : parseDepFile(depfile).deps) {
-            task->pushTrigger(list.find(f.string()));
+            //            task->pushTrigger(list.find(f.string()));
+            task->pushIn(list.find(f.string()));
         }
     }
 
