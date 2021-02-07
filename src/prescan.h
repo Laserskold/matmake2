@@ -130,12 +130,12 @@ PrescanResult parseExpandedFile(filesystem::path expandedFile,
     }
 
     {
-        auto &impJson = json["include"];
+        auto &incJson = json["include"];
 
-        impJson = Json::Array;
+        incJson.type = Json::Array;
 
         for (auto &imp : ret.includes) {
-            impJson.push_back(Json{}.string(imp));
+            incJson.push_back(Json{}.string(imp));
         }
     }
 
@@ -170,12 +170,28 @@ PrescanResult prescan(Task &task) {
     return parseExpandedFile(expandedFile, jsonFile);
 }
 
-void prescan(TaskList &list) {
-    createDirectories(list);
+// Get or create a task for a header
+Task *getHeaderTask(TaskList &tasks, filesystem::path path) {
+    if (auto type = getType(path);
+        type == SourceType::Header || type == SourceType::CxxHeader) {
+        if (auto f = tasks.find(path)) {
+            return f;
+        }
+        else {
+            auto &task = tasks.emplace();
+            task.out("." / path);
+            return &task;
+        }
+    }
+    return {};
+}
+
+void prescan(TaskList &tasks) {
+    createDirectories(tasks);
 
     std::vector<std::pair<Task *, std::string>> connections;
 
-    for (auto &task : list) {
+    for (auto &task : tasks) {
         if (auto t = getType(task->out());
             t == SourceType::ExpandedModuleSource) {
             auto prescanResult = prescan(*task);
@@ -185,6 +201,10 @@ void prescan(TaskList &list) {
             pcm->name(prescanResult.name);
 
             for (auto &in : prescanResult.imports) {
+                connections.push_back({pcm, "@" + in});
+            }
+
+            for (auto &in : prescanResult.includes) {
                 connections.push_back({pcm, in});
             }
         }
@@ -192,7 +212,12 @@ void prescan(TaskList &list) {
 
     //! All files must be prescanned before this can happend
     for (auto &pair : connections) {
-        auto inTask = list.find("@" + pair.second);
-        pair.first->pushIn(inTask);
+        auto inTask = tasks.find(pair.second);
+        if (!inTask) {
+            pair.first->pushIn(getHeaderTask(tasks, pair.second));
+        }
+        else {
+            pair.first->pushIn(inTask);
+        }
     }
 }

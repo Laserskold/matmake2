@@ -36,11 +36,12 @@
     "cxx": "g++",
     "dir": "build/g++",
     "command": "[root]",
+    "includeprefix": "-I",
     "commands": {
       "cxx": "{c++} -x c++ {src} -o {out} -c -MD -MF {depfile} {cxxflags} {flags} {includes}",
       "exe": "{c++} {in} -o {out} {ldflags} {includes}",
       "gch": "{c++} {src} -o {out} -MD -MF {depfile} {cxxflags} {flags} {includes}",
-      "eem": "{c++} {src} -E -o {out}"
+      "eem": "{c++} {src} {includes} -E -o {out}"
     }
   },
   {

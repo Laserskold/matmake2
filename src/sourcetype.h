@@ -6,6 +6,8 @@
 enum class SourceType {
     NotFound,
 
+    Header,
+    CxxHeader,
     CxxSource,
     ModuleSource,
     ExpandedModuleSource,
@@ -14,6 +16,10 @@ enum class SourceType {
 };
 
 inline const auto sourceTypeMap = std::map<filesystem::path, SourceType>{
+    {".h", SourceType::Header},
+    {".hpp", SourceType::CxxHeader},
+    {".hxx", SourceType::CxxHeader},
+
     {".cpp", SourceType::CxxSource},
     {".cxx", SourceType::CxxSource},
     {".cc", SourceType::CxxSource},

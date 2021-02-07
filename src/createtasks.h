@@ -163,6 +163,7 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
         task.command(p->value());
     }
     if (auto p = root.property("src")) {
+
         for (auto &src : p->values) {
             auto paths = expandPaths(src);
 
@@ -180,6 +181,14 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
     }
     if (auto p = root.property("flags")) {
         task.flags(p->concat());
+    }
+    if (auto p = root.property("includes")) {
+        for (auto &include : p->values) {
+            task.pushInclude(include);
+        }
+    }
+    if (auto p = root.property("includeprefix")) {
+        task.includePrefix(p->value());
     }
     {
         auto &commands = root.ocommands();

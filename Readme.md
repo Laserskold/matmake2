@@ -41,3 +41,4 @@ https://clang.llvm.org/docs/Modules.html
 
 ## Todo
 - [ ] Automatically parse visual studio debug console environment variables before build
+- [ ] Include matmakefiles from other directories

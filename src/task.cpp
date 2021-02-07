@@ -159,12 +159,12 @@ void Task::print(bool verbose, size_t indentation) {
         }
     }
 
-    if (!triggers().empty()) {
-        indent() << "triggers:\n";
-        for (auto &trigger : triggers()) {
-            trigger->print(verbose, indentation + 1);
-        }
-    }
+    //    if (!triggers().empty()) {
+    //        indent() << "triggers:\n";
+    //        for (auto &trigger : triggers()) {
+    //            trigger->print(verbose, indentation + 1);
+    //        }
+    //    }
 
     indent() << " -- \n";
 }

@@ -178,11 +178,62 @@ public:
         else if (name == "modules") {
             return modulesString();
         }
+        else if (name == "includes") {
+            return includes();
+        }
         return {};
+    }
+
+    std::string includes() const {
+        if (_includes.empty()) {
+            if (_parent) {
+                return parent()->includes();
+            }
+            else {
+                return {};
+            }
+        }
+        else {
+            return concatIncludes();
+        }
+    }
+
+    std::string concatIncludes() const {
+        std::ostringstream ss;
+
+        auto includePrefix = this->includePrefix();
+
+        for (auto &i : _includes) {
+            ss << includePrefix << i << " ";
+        }
+
+        return ss.str();
+    }
+
+    void pushInclude(std::string includes) {
+        _includes.push_back(includes);
     }
 
     void depfile(filesystem::path path) {
         _depfile = path;
+    }
+
+    void includePrefix(std::string includePrefix) {
+        _includePrefix = includePrefix;
+    }
+
+    std::string includePrefix() const {
+        if (_includePrefix.empty()) {
+            if (_parent) {
+                return parent()->includePrefix();
+            }
+            else {
+                return {};
+            }
+        }
+        else {
+            return _includePrefix;
+        }
     }
 
     filesystem::path depfile() const {
@@ -431,6 +482,8 @@ private:
     std::string _command;                         // If empty use parents
     std::map<std::string, std::string> _commands; // Parents build command
     std::string _flags;
+    std::vector<std::string> _includes;
+    std::string _includePrefix;
 
     // Fixed during connection step
     std::vector<Task *> _in; // Files that needs to be built before this file
