@@ -10,5 +10,10 @@ import other2;
 // clang++-11 -std=c++2a -fmodules-ts -c src/test.pcm  -o src/test.o
 
 export int other() {
-    return 10 + other2();
+    auto x = std::string{"hello"};
+    return 10 + other2() + x.size();
+}
+
+export std::string str() {
+    return "hello there";
 }

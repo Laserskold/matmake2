@@ -68,6 +68,7 @@ Settings::Settings(int argc, char **argv) {
         }
         else if (arg == "--debug" || arg == "-d") {
             debugPrint = true;
+            verbose = true;
         }
         else if (arg == "--list" || arg == "-l") {
             command = Command::List;
