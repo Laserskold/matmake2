@@ -1,11 +1,8 @@
 ﻿# CMakeList.txt : CMake project for Matmake-v2
 
 cmake_minimum_required (VERSION 3.16)
-if (MSVC_VERSION GREATER_EQUAL "1900")
-    add_compile_options("/std:c++latest")
-else()
-    set(CMAKE_CXX_STANDARD 17)
-endif()
+
+set(CMAKE_CXX_STANDARD 17)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -time-trace")
