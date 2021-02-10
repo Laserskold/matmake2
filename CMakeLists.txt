@@ -51,9 +51,15 @@ file (
 ## ===== Tests =====================================
 
 add_executable (task_test test/task_test.cpp)
+add_executable (build_test test/build_test.cpp)
 
 enable_testing()
-add_test(NAME tests COMMAND task_test)
+add_test(NAME task_test COMMAND task_test)
+
+if (WIN32)
+else()
+add_test(NAME build_test COMMAND build_test)
+endif()
 
 
 
