@@ -13,14 +13,14 @@ public:
 
         while ((f = command.find('{', old)) != std::string::npos) {
             segments.push_back({
-                .value = command.substr(old, f - old),
-                .isReference = false,
+                command.substr(old, f - old),
+                false,
             });
 
             if ((old = command.find('}', f)) != std::string::npos) {
                 segments.push_back({
-                    .value = command.substr(f + 1, old - f - 1),
-                    .isReference = true,
+                    command.substr(f + 1, old - f - 1),
+                    true,
                 });
                 ++old;
             }
