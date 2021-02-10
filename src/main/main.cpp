@@ -8,11 +8,27 @@
 #include "tasklist.h"
 #include "json/json.h"
 
+auto createTasksFromMatmakefile = [](const Settings &settings) -> TaskList {
+    if (!filesystem::exists(settings.matmakeFile)) {
+        std::cerr << "no matmakefile found in directory\n";
+        return {};
+    }
+
+    auto json = Json::loadFile(settings.matmakeFile.string());
+
+    auto matmakeFile = MatmakeFile{json};
+
+    if (settings.debugPrint) {
+        matmakeFile.print(std::cout);
+    }
+
+    return createTasks(matmakeFile, settings.target);
+};
+
 int main(int argc, char **argv) {
     const auto settings = Settings{argc, argv};
 
     switch (settings.command) {
-
     case Command::ParseTasks:
         if (!settings.taskFile.empty()) {
             filesystem::current_path(settings.taskFile.parent_path());
@@ -50,20 +66,12 @@ int main(int argc, char **argv) {
         }
         break;
     case Command::Build: {
-        if (!filesystem::exists(settings.matmakeFile)) {
-            std::cerr << "no matmakefile found in directory\n";
-            return 1;
+        auto tasks = createTasksFromMatmakefile(settings);
+
+        if (tasks.empty()) {
+            throw std::runtime_error{"could not find target " +
+                                     settings.target};
         }
-
-        auto json = Json::loadFile(settings.matmakeFile.string());
-
-        auto matmakeFile = MatmakeFile{json};
-
-        if (settings.debugPrint) {
-            matmakeFile.print(std::cout);
-        }
-
-        auto tasks = createTasks(matmakeFile, settings.target);
 
         if (settings.printTree) {
             std::cout << "\n"
@@ -94,15 +102,26 @@ int main(int argc, char **argv) {
             return status;
         }
     } break;
-    case Command::Clean: {
+    case Command::List: {
         auto json = Json::loadFile(settings.matmakeFile.string());
 
         auto matmakeFile = MatmakeFile{json};
 
-        auto tasks = createTasks(matmakeFile, settings.target);
+        for (auto &node : matmakeFile.nodes()) {
+            if (auto p = node.property("command");
+                p && p->concat() == "[root]") {
+                std::cout << node.name() << "\n";
+            }
+        }
+
+    } break;
+    case Command::Clean: {
+        auto tasks = createTasksFromMatmakefile(settings);
 
         for (auto &task : tasks) {
-            task->clean();
+            if (task->clean() && settings.verbose) {
+                std::cout << "removed " << task->out() << "\n";
+            }
         }
 
     } break;

@@ -402,6 +402,10 @@ public:
         }
     }
 
+    bool isRoot() {
+        return _command == "[root]";
+    }
+
     void flags(std::string flags) {
         _flags = flags;
     }
@@ -471,23 +475,30 @@ public:
         }
     }
 
-    void clean() const {
+    //! @return true if removed something false else
+    bool clean() const {
         if (_state == TaskState::Raw) {
-            return;
+            return false;
         }
+
+        bool removed = false;
 
         {
             auto d = depfile();
             if (filesystem::exists(d)) {
                 filesystem::remove(d);
+                removed = true;
             }
         }
         {
             auto o = out();
             if (filesystem::exists(o)) {
                 filesystem::remove(o);
+                removed = true;
             }
         }
+
+        return removed;
     }
 
     Json dump();

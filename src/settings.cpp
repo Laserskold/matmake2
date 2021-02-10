@@ -13,6 +13,7 @@ options:
 -C [dir]              run in another directory
 --target -t [target]  select target (eg g++, clang++, msvc)
 --clean               remove all built file
+--list                list available targets
 
 developer options:
 --tasks [taskfile]    build a task json-file
@@ -20,7 +21,6 @@ developer options:
 --print-tree          print dependency tree
 --print-tasks         print list of tasks
 --debug -d            print debugging information
-
 
 )_";
 
@@ -68,6 +68,9 @@ Settings::Settings(int argc, char **argv) {
         }
         else if (arg == "--debug" || arg == "-d") {
             debugPrint = true;
+        }
+        else if (arg == "--list" || arg == "-l") {
+            command = Command::List;
         }
     }
 }

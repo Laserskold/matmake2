@@ -7,6 +7,7 @@ enum class Command {
     Build,
     ParseTasks,
     Clean,
+    List,
 };
 
 struct Settings {

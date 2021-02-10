@@ -42,4 +42,6 @@ https://clang.llvm.org/docs/Modules.html
 ## Todo
 - [ ] Automatically parse visual studio debug console environment variables before build
 - [ ] Include matmakefiles from other directories
-- [ ] Fix updating when changing files
+- [ ] Trace command line arguments
+- [ ] Shared libraries
+- [ ] Static libraries
