@@ -1,7 +1,8 @@
 #include <iostream>
 
 import other;
+import other2;
 
 int main() {
-    std::cout << other() << "\n";
+    std::cout << other() * other2() << "\n";
 }

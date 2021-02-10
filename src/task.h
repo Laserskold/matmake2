@@ -360,7 +360,7 @@ public:
 
         for (auto &in : in()) {
             if (in->isModule()) {
-                ss << "-fmodule-file=" << in->out();
+                ss << "-fmodule-file=" << in->out() << " ";
             }
         }
 
