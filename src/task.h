@@ -166,7 +166,7 @@ public:
         }
         else if (name == "src") {
             if (!_in.empty()) {
-                return _in.front()->out();
+                return _in.front()->out().string();
             }
         }
         else if (name == "c++") {

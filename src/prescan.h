@@ -23,12 +23,12 @@ std::optional<PrescanResult> parsePrescanResults(filesystem::path expandedFile,
     if (!filesystem::exists(expandedFile) || !filesystem::exists(jsonFile)) {
         return {}; // Not found -> create files
     }
-    else if (filesystem::last_write_time(jsonFile) <
+    else if (filesystem::last_write_time(jsonFile.string()) <
              filesystem::last_write_time(source)) {
         return {}; // Its old -> redo
     }
 
-    const auto json = Json::loadFile(jsonFile);
+    const auto json = Json::loadFile(jsonFile.string());
 
     auto result = PrescanResult{};
 
@@ -178,7 +178,7 @@ PrescanResult prescan(Task &task) {
 Task *getHeaderTask(TaskList &tasks, filesystem::path path) {
     if (auto type = getType(path);
         type == SourceType::Header || type == SourceType::CxxHeader) {
-        if (auto f = tasks.find(path)) {
+        if (auto f = tasks.find(path.string())) {
             return f;
         }
         else {
