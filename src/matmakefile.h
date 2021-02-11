@@ -63,18 +63,7 @@ public:
 
 class MatmakeFile {
 public:
-    MatmakeFile(const Json &json) {
-        if (json.type != Json::Array) {
-            throw std::runtime_error{"Json: Wrong type when expected array " +
-                                     std::string{json.pos}};
-        }
-
-        _nodes.reserve(json.size());
-
-        for (auto &j : json) {
-            _nodes.emplace_back(j);
-        }
-    }
+    MatmakeFile(const Json &json);
 
     void print(std::ostream &stream = std::cout) {
         for (auto &child : _nodes) {

@@ -24,38 +24,5 @@
       "Wall",
       "Wpedantic"
     ]
-  },
-  {
-    "name": "debug",
-    "in": "@all",
-    "config": [ "debug" ]
-  },
-  {
-    "name": "g++",
-    "in": [ "@all" ],
-    "cxx": "g++",
-    "dir": "build/g++",
-    "command": "[root]",
-    "includeprefix": "-I",
-    "commands": {
-      "cxx": "{c++} -x c++ {src} -o {out} -c -MD -MF {depfile} {cxxflags} {flags} {includes}",
-      "exe": "{c++} {in} -o {out} {ldflags} {includes}",
-      "gch": "{c++} {src} -o {out} -MD -MF {depfile} {cxxflags} {flags} {includes}",
-      "eem": "{c++} {src} {includes} -E -o {out}"
-    }
-  },
-  {
-    "name": "g++-debug",
-    "in": [ "@debug" ],
-    "cxx": "g++",
-    "dir": "build/g++-debug",
-    "command": "[root]"
-  },
-  {
-    "name": "msvc",
-    "in": [ "@all" ],
-    "cxx": "cl",
-    "dir": "build/msvc",
-    "command": "[root]"
   }
 ]

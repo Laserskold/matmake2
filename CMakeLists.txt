@@ -23,6 +23,9 @@ add_library(
    "src/task.h"
    "src/settings.cpp"
    "src/settings.h"
+   "src/matmakefile.cpp"
+   "src/defaultfile.cpp"
+   "src/defaultfile.h"
 )
 
 link_libraries(matmake2-core  ${CMAKE_THREAD_LIBS_INIT})
