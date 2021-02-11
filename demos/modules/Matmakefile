@@ -1,0 +1,19 @@
+# Matmakefile
+# See https://github.com/mls-m5/matmake2
+
+main
+  name = main
+  out =
+  src =
+    src/*.cpp src/*.cppm
+  copy = data/*
+  includes = include
+  command = [exe]
+
+all
+  name = all
+  in = @main
+  config =
+    Wall
+    Wpedantic
+    modules

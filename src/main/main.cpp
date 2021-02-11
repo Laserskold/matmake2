@@ -14,7 +14,7 @@ auto createTasksFromMatmakefile = [](const Settings &settings) -> TaskList {
         return {};
     }
 
-    auto json = Json::loadFile(settings.matmakeFile.string());
+    auto json = Json::LoadFile(settings.matmakeFile.string());
 
     auto matmakeFile = MatmakeFile{json};
 
@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
         }
     } break;
     case Command::List: {
-        auto json = Json::loadFile(settings.matmakeFile.string());
+        auto json = Json::LoadFile(settings.matmakeFile.string());
 
         auto matmakeFile = MatmakeFile{json};
 

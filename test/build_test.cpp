@@ -18,7 +18,7 @@ void setupProject() {
 }
 
 auto getTasks() {
-    const auto json = Json::loadFile((testPath / "matmake.json").string());
+    const auto json = Json::LoadFile((testPath / "matmake.json").string());
 
     auto matmakefile = MatmakeFile{json};
 

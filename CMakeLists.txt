@@ -55,9 +55,11 @@ file (
 
 add_executable (task_test test/task_test.cpp)
 add_executable (build_test test/build_test.cpp)
+add_executable (parse_matmakefile_teste test/parse_matmakefile_test.cpp)
 
 enable_testing()
 add_test(NAME task_test COMMAND task_test)
+add_test(NAME parse_matmakefile_test COMMAND parse_matmakefile_test)
 
 if (WIN32)
 else()
