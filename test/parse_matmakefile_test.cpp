@@ -1,3 +1,6 @@
+#define DO_NOT_CATCH_ERRORS
+
+#include "line.h"
 #include "mls-unit-test/unittest.h"
 #include "parsematmakefile.h"
 
@@ -23,13 +26,32 @@ TEST_CASE("Line") {
     }
 
     {
-
         auto line = Line{"  hello = there"};
 
         ASSERT_EQ(line.type, Line::Assignment);
         ASSERT_EQ(line.indent, 2);
         ASSERT_EQ(line.name, "hello");
-        ASSERT_EQ(line.value, "there");
+        ASSERT_EQ(line.value.size(), 1);
+        ASSERT_EQ(line.value.front(), "there");
+    }
+
+    {
+        auto ss = std::istringstream{"main\n  in = \n    x.cpp\n"};
+
+        auto line1 = Line{ss};
+        ASSERT_EQ(line1.name, "main");
+        ASSERT_EQ(line1.type, Line::Normal);
+        ASSERT_EQ(line1.indent, 0);
+
+        auto line2 = Line{ss};
+        ASSERT_EQ(line2.name, "in");
+        ASSERT_EQ(line2.type, Line::UnfinishedAssignment);
+        ASSERT_EQ(line2.indent, 2);
+
+        auto line3 = Line{ss};
+        ASSERT_EQ(line3.name, "x.cpp");
+        ASSERT_EQ(line3.type, Line::Normal);
+        ASSERT_EQ(line3.indent, 4);
     }
 }
 
@@ -48,6 +70,7 @@ main
 
     auto &first = json.front();
 
+    ASSERT_EQ(first.name, "main");
     ASSERT_EQ(first["in"].string(), "src/*.cpp");
     ASSERT_EQ(first["out"].string(), "main");
 }
@@ -69,8 +92,12 @@ main
 
     auto &first = json.front();
 
-    ASSERT_EQ(first["in"].string(), "src/*.cpp");
+    ASSERT_EQ(first.name, "main");
     ASSERT_EQ(first["out"].string(), "main");
+
+    ASSERT_EQ(first["in"].size(), 2);
+    ASSERT_EQ(first["in"].front().string(), "src/*.cpp");
+    ASSERT_EQ(first["in"].back().string(), "src/*.cppm");
 }
 
 TEST_SUIT_END
