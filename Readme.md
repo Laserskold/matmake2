@@ -1,6 +1,29 @@
 Matmake2
 ============================
 
+Matmake2 is a robust, fast and small c++-module-supporting build system.
+
+Features:
+* Small configuration files
+* Automatic dependency checking
+* c++-20 modules support
+
+Example syntax
+----------------
+
+The following will include all cpp and cppm-files in "src" and
+build a executable named `main` or `main.exe`  (depending on platform)
+
+```make
+
+main
+    src = *.cpp *.cppm
+    out = main
+    config = c++20 modules
+
+```
+
+
 Building on Linux
 ------------------
 ### Using build script
@@ -18,44 +41,35 @@ or
 ./build-linux.sh g++-10
 ```
 
-"clang++10" can be replaced with the compiler of your choice.
-Note that you need a compiler that supports c++10 and std::filesystem.
-I recommend clang++-10 or g++-10
+### Build for windows
 
-After building, matmake will be located in the "build"-directory.
+#### G++
+Install Mingw
 
+run
 
-### Build using Using cmake (for matmake development)
-* Install cmake, ninja and g++ (or clang++)
-* Create a build forder and run cmake in it. It will probably just work
-
-```
-mkdir build
-cd build
-cmake .. -G Ninja
-ninja
+```bat
+build-win-gcc.bat
 ```
 
-Windows
--------------------
+#### Visual studio 2019 Community Edition
+Install visual studio 2019
+run 
 
-Install
+```bat
+build-win-msvc.bat
+```
 
-* Install Visual studio, clang mingw
-* Then just use the cmake gui to select the right compiler 
-(doing it with command line is almost impossible)
+#### Clang (requires Visual studio 2019 to be installed)
 
-
-Run unit tests
------------------------
-Goto build directory.
-
-Run `ctest`.
-
+run
+```
+build-win-clang.bat
+```
 
 
 For more information about c++20 modules (in clang)
-_____________________________________________________
+---------------------------------------------------
 
 https://clang.llvm.org/docs/Modules.html
 
