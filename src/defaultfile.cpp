@@ -9,7 +9,7 @@ const char *defaultCompilerSource = R"_(
     "in": [ "@all" ],
     "cxx": "clang++-11",
     "dir": "build/clang",
-    "flags": [ "-fmodules-ts", "-std=c++2a" ],
+    "flags": [ "-fmodules-ts", "-std=c++17" ],
     "command": "[root]",
     "includeprefix": "-I",
     "commands": {
@@ -26,7 +26,7 @@ const char *defaultCompilerSource = R"_(
     "in": [ "@all" ],
     "cxx": "g++",
     "dir": "build/gcc",
-    "flags": [ "-std=c++2a" ],
+    "flags": [ "-std=c++17" ],
     "command": "[root]",
     "includeprefix": "-I",
     "commands": {
