@@ -3,9 +3,10 @@
 
 main
   name = main
-  out =
+  out = main
   src =
-    src/*.cpp src/*.cppm
+    src/*.cpp
+    src/*.cppm
   copy = data/*
   includes = include
   command = [exe]
