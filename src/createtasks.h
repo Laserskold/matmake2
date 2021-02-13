@@ -21,8 +21,12 @@ std::vector<filesystem::path> expandPaths(filesystem::path expression) {
             if (it.path() == "." || it.path() == "..") {
                 continue;
             }
+#ifdef __cpp_lib_experimental_filesystem
+            auto path = filesystem::path{it.path().string().substr(2)};
+#else
             auto path = filesystem::relative(it.path(),
                                              "./"); // Remove "./" in beginning
+#endif
 
             auto fn = path.filename().string();
 
