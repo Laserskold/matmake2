@@ -51,7 +51,7 @@ Json parseMatmakefile(std::istream &file) {
     return json;
 }
 
-Json parseMatmakefile(filesystem::__cxx11::path path) {
+Json parseMatmakefile(filesystem::path path) {
     auto file = std::ifstream{path};
 
     if (!file.is_open()) {

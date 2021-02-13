@@ -56,7 +56,11 @@ file (
 
 add_executable (task_test test/task_test.cpp)
 add_executable (build_test test/build_test.cpp)
-add_executable (parse_matmakefile_teste test/parse_matmakefile_test.cpp)
+add_executable (parse_matmakefile_test test/parse_matmakefile_test.cpp)
+
+target_precompile_headers(task_test REUSE_FROM matmake2-core)
+target_precompile_headers(build_test REUSE_FROM matmake2-core)
+target_precompile_headers(parse_matmakefile_test REUSE_FROM matmake2-core)
 
 enable_testing()
 add_test(NAME task_test COMMAND task_test)

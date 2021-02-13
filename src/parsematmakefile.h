@@ -5,6 +5,7 @@
 #include "json/json.h"
 #include <algorithm>
 #include <iostream>
+#include "filesystem.h"
 
 Json parseMatmakefile(std::istream &file);
 
