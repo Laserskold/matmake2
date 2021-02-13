@@ -25,7 +25,7 @@ const char *defaultCompilerSource = R"_(
     "name": "gcc",
     "in": [ "@all" ],
     "cxx": "g++",
-    "dir": "build/clang",
+    "dir": "build/gcc",
     "flags": [ "-std=c++2a" ],
     "command": "[root]",
     "includeprefix": "-I",
