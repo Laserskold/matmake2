@@ -190,6 +190,9 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
             task.pushInclude(include);
         }
     }
+    if (auto p = root.property(("depprefix"))) {
+        task.depfile(p->value());
+    }
     if (auto p = root.property("includeprefix")) {
         task.includePrefix(p->value());
     }

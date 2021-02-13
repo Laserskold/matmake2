@@ -55,6 +55,9 @@ void Task::parse(const Json &jtask) {
     if (auto f = jsonFind("ldflags")) {
         flags(f->string());
     }
+    if (auto f = jsonFind("depprefix")) {
+        depprefix(f->string());
+    }
 }
 
 Json Task::dump() {
@@ -74,6 +77,7 @@ Json Task::dump() {
     attachValue("cxx", _cxx.string());
     attachValue("flags", _flags);
     attachValue("ldflags", _ldflags);
+    attachValue("depprefix", _depprefix);
 
     if (!_in.empty()) {
         auto &j = json["in"];

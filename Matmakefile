@@ -10,6 +10,8 @@ matmake2
     src
     lib/json.h/include
   command = [exe]
+  ldflags = -pthread
+  copy = demos
 
 all
   name = all

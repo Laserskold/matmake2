@@ -159,7 +159,10 @@ public:
             return dir().string();
         }
         else if (name == "depfile") {
-            return depfile().string();
+            auto d = depfile().string();
+            if (!d.empty()) {
+                return depprefix() + d;
+            }
         }
         else if (name == "in") {
             return concatIn();
@@ -423,13 +426,30 @@ public:
         }
     }
 
+    void flags(std::string flags) {
+        _flags = flags;
+    }
+
+    std::string depprefix() const {
+        if (_depprefix.empty()) {
+            if (_parent) {
+                return _parent->depprefix();
+            }
+            else {
+                return {};
+            }
+        }
+        else {
+            return _depprefix;
+        }
+    }
+
+    void depprefix(std::string value) {
+        _depprefix = value;
+    }
 
     bool isRoot() {
         return _command == "[root]";
-    }
-
-    void flags(std::string flags) {
-        _flags = flags;
     }
 
     //! Remove triggers that is raw or fresh
@@ -539,6 +559,7 @@ private:
     std::map<std::string, std::string> _commands; // Parents build command
     std::string _flags;
     std::string _ldflags;
+    std::string _depprefix;
     std::vector<std::string> _includes;
     std::string _includePrefix;
 

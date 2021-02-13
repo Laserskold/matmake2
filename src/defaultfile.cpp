@@ -13,9 +13,9 @@ const char *defaultCompilerSource = R"_(
     "command": "[root]",
     "includeprefix": "-I",
     "commands": {
-      "cxx": "{c++} -x c++ {src} {modules} -o {out} -c -MD -MF {depfile} {cxxflags} {flags} {includes}",
+      "cxx": "{c++} -x c++ {src} {modules} -o {out} -c {depfile} {cxxflags} {flags} {includes}",
       "exe": "{c++} {in} -o {out} {ldflags} {includes}",
-      "gch": "{c++} {in} -o {out} -MD -MF {depfile} {cxxflags} {flags} {includes}",
+      "gch": "{c++} {in} -o {out} {depfile} {cxxflags} {flags} {includes}",
       "eem": "{c++} {in} {flags} {includes} -E > {out}",
       "pcm": "{c++} {cxxflags} {flags} {includes} {modules} --precompile -x c++-module {src} -o {out} ",
       "cxxm": "{c++} {cxxflags} {flags} {includes} -c {in} -o {out} "
@@ -30,9 +30,9 @@ const char *defaultCompilerSource = R"_(
     "command": "[root]",
     "includeprefix": "-I",
     "commands": {
-      "cxx": "{c++} -x c++ {src} {modules} -o {out} -c -MD -MF {depfile} {cxxflags} {flags} {includes}",
+      "cxx": "{c++} -x c++ {src} {modules} -o {out} -c {depfile} {cxxflags} {flags} {includes}",
       "exe": "{c++} {in} -o {out} {ldflags} {includes}",
-      "gch": "{c++} {in} -o {out} -MD -MF {depfile} {cxxflags} {flags} {includes}",
+      "gch": "{c++} {in} -o {out} {depfile} {cxxflags} {flags} {includes}",
       "eem": "{c++} {in} {flags} {includes} -E > {out}",
       "pcm": "{c++} {cxxflags} {flags} {includes} {modules} --precompile -x c++-module {src} -o {out} ",
       "cxxm": "{c++} {cxxflags} {flags} {includes} -c {in} -o {out} "
