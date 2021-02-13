@@ -8,7 +8,6 @@ Json parseMatmakefile(std::istream &file) {
     auto json = Json{Json::Array};
 
     auto lastTarget = Json{};
-    auto lastIndent = size_t{0};
 
     auto finishTarget = [&lastTarget, &json] {
         if (!lastTarget.empty()) {
@@ -21,8 +20,8 @@ Json parseMatmakefile(std::istream &file) {
         switch (line.type) {
         case Line::Normal:
             if (lastTarget.size() > 0 && line.indent > 0) {
-                lastTarget.type = Json::Array;
-                lastTarget.back().emplace_back(line.name);
+                lastTarget.back().emplace_back(Json{line.name});
+                lastTarget.back().type = Json::Array;
             }
             else {
                 finishTarget();
@@ -43,7 +42,6 @@ Json parseMatmakefile(std::istream &file) {
             lastTarget[line.name];
             break;
         }
-        lastIndent = line.indent;
     }
 
     finishTarget();

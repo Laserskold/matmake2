@@ -12,13 +12,13 @@ enum class Command {
 
 struct Settings {
     filesystem::path taskFile;
-    filesystem::path matmakeFile = "matmake.json";
+    filesystem::path matmakeFile = "Matmakefile";
     bool printTree = false;
     bool printTasks = false;
     bool verbose = false;
     bool debugPrint = false;
     bool skipBuild = false;
-    std::string target = "g++";
+    std::string target = "";
 
     Command command = Command::Build;
 
