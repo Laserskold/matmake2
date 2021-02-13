@@ -26,6 +26,7 @@ add_library(
    "src/matmakefile.cpp"
    "src/defaultfile.cpp"
    "src/defaultfile.h"
+   "src/parsematmakefile.cpp"
 )
 
 link_libraries(matmake2-core  ${CMAKE_THREAD_LIBS_INIT})
@@ -55,9 +56,15 @@ file (
 
 add_executable (task_test test/task_test.cpp)
 add_executable (build_test test/build_test.cpp)
+add_executable (parse_matmakefile_test test/parse_matmakefile_test.cpp)
+
+target_precompile_headers(task_test REUSE_FROM matmake2-core)
+target_precompile_headers(build_test REUSE_FROM matmake2-core)
+target_precompile_headers(parse_matmakefile_test REUSE_FROM matmake2-core)
 
 enable_testing()
 add_test(NAME task_test COMMAND task_test)
+add_test(NAME parse_matmakefile_test COMMAND parse_matmakefile_test)
 
 if (WIN32)
 else()

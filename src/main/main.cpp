@@ -4,19 +4,28 @@
 #include "createtasks.h"
 #include "filesystem.h"
 #include "matmakefile.h"
+#include "parsematmakefile.h"
 #include "settings.h"
 #include "tasklist.h"
 #include "json/json.h"
 
 auto createTasksFromMatmakefile = [](const Settings &settings) -> TaskList {
-    if (!filesystem::exists(settings.matmakeFile)) {
-        std::cerr << "no matmakefile found in directory\n";
-        return {};
-    }
+    auto getJson = [&]() -> Json {
+        if (settings.matmakeFile.extension() == ".json") {
 
-    auto json = Json::loadFile(settings.matmakeFile.string());
+            if (!filesystem::exists(settings.matmakeFile)) {
+                std::cerr << "no matmakefile found in directory\n";
+                return {};
+            }
 
-    auto matmakeFile = MatmakeFile{json};
+            return Json::LoadFile(settings.matmakeFile.string());
+        }
+        else {
+            return parseMatmakefile(settings.matmakeFile);
+        }
+    };
+
+    auto matmakeFile = MatmakeFile{getJson()};
 
     if (settings.debugPrint) {
         matmakeFile.print(std::cout);
@@ -68,6 +77,11 @@ int main(int argc, char **argv) {
     case Command::Build: {
         auto tasks = createTasksFromMatmakefile(settings);
 
+        if (settings.target.empty()) {
+            throw std::runtime_error{
+                "no target specified. Use \"--target\" to specify"};
+        }
+
         if (tasks.empty()) {
             throw std::runtime_error{"could not find target " +
                                      settings.target};
@@ -103,7 +117,7 @@ int main(int argc, char **argv) {
         }
     } break;
     case Command::List: {
-        auto json = Json::loadFile(settings.matmakeFile.string());
+        auto json = Json::LoadFile(settings.matmakeFile.string());
 
         auto matmakeFile = MatmakeFile{json};
 

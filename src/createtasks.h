@@ -21,8 +21,12 @@ std::vector<filesystem::path> expandPaths(filesystem::path expression) {
             if (it.path() == "." || it.path() == "..") {
                 continue;
             }
+#ifdef __cpp_lib_experimental_filesystem
+            auto path = filesystem::path{it.path().string().substr(2)};
+#else
             auto path = filesystem::relative(it.path(),
                                              "./"); // Remove "./" in beginning
+#endif
 
             auto fn = path.filename().string();
 
@@ -182,10 +186,16 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
     if (auto p = root.property("flags")) {
         task.flags(p->concat());
     }
+    if (auto p = root.property("ldflags")) {
+        task.ldflags(p->concat());
+    }
     if (auto p = root.property("includes")) {
         for (auto &include : p->values) {
             task.pushInclude(include);
         }
+    }
+    if (auto p = root.property(("depprefix"))) {
+        task.depfile(p->value());
     }
     if (auto p = root.property("includeprefix")) {
         task.includePrefix(p->value());

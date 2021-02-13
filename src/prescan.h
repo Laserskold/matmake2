@@ -28,7 +28,7 @@ std::optional<PrescanResult> parsePrescanResults(filesystem::path expandedFile,
         return {}; // Its old -> redo
     }
 
-    const auto json = Json::loadFile(jsonFile.string());
+    const auto json = Json::LoadFile(jsonFile.string());
 
     auto result = PrescanResult{};
 

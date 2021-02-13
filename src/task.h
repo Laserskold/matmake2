@@ -159,7 +159,10 @@ public:
             return dir().string();
         }
         else if (name == "depfile") {
-            return depfile().string();
+            auto d = depfile().string();
+            if (!d.empty()) {
+                return depprefix() + d;
+            }
         }
         else if (name == "in") {
             return concatIn();
@@ -174,6 +177,9 @@ public:
         }
         else if (name == "flags") {
             return flags();
+        }
+        else if (name == "ldflags") {
+            return ldflags();
         }
         else if (name == "modules") {
             return modulesString();
@@ -388,6 +394,24 @@ public:
         _isChangedTimeCurrent = true;
     }
 
+    std::string ldflags() const {
+        if (_ldflags.empty()) {
+            if (_parent) {
+                return _parent->ldflags();
+            }
+            else {
+                return {};
+            }
+        }
+        else {
+            return _ldflags;
+        }
+    }
+
+    void ldflags(std::string value) {
+        _ldflags = value;
+    }
+
     std::string flags() const {
         if (_flags.empty()) {
             if (_parent) {
@@ -402,12 +426,30 @@ public:
         }
     }
 
-    bool isRoot() {
-        return _command == "[root]";
-    }
-
     void flags(std::string flags) {
         _flags = flags;
+    }
+
+    std::string depprefix() const {
+        if (_depprefix.empty()) {
+            if (_parent) {
+                return _parent->depprefix();
+            }
+            else {
+                return {};
+            }
+        }
+        else {
+            return _depprefix;
+        }
+    }
+
+    void depprefix(std::string value) {
+        _depprefix = value;
+    }
+
+    bool isRoot() {
+        return _command == "[root]";
     }
 
     //! Remove triggers that is raw or fresh
@@ -516,6 +558,8 @@ private:
     std::string _command;                         // If empty use parents
     std::map<std::string, std::string> _commands; // Parents build command
     std::string _flags;
+    std::string _ldflags;
+    std::string _depprefix;
     std::vector<std::string> _includes;
     std::string _includePrefix;
 
