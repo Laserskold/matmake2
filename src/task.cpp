@@ -52,6 +52,9 @@ void Task::parse(const Json &jtask) {
     if (auto f = jsonFind("flags")) {
         flags(f->string());
     }
+    if (auto f = jsonFind("ldflags")) {
+        flags(f->string());
+    }
 }
 
 Json Task::dump() {
@@ -70,6 +73,7 @@ Json Task::dump() {
     attachValue("command", _command);
     attachValue("cxx", _cxx.string());
     attachValue("flags", _flags);
+    attachValue("ldflags", _ldflags);
 
     if (!_in.empty()) {
         auto &j = json["in"];
@@ -133,11 +137,12 @@ void Task::print(bool verbose, size_t indentation) {
 
     indent() << "state: " << stateMap.at(static_cast<int>(_state)) << "\n";
 
-    {
-        auto flags = this->flags();
-        if (!flags.empty()) {
-            indent() << "flags: " << flags << "\n";
-        }
+    if (auto flags = this->flags(); !flags.empty()) {
+        indent() << "flags: " << flags << "\n";
+    }
+
+    if (auto ldflags = this->ldflags(); !ldflags.empty()) {
+        indent() << "ldflags: " << ldflags << "\n";
     }
 
     if (verbose) {

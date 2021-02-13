@@ -182,6 +182,9 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
     if (auto p = root.property("flags")) {
         task.flags(p->concat());
     }
+    if (auto p = root.property("ldflags")) {
+        task.ldflags(p->concat());
+    }
     if (auto p = root.property("includes")) {
         for (auto &include : p->values) {
             task.pushInclude(include);

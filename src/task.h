@@ -175,6 +175,9 @@ public:
         else if (name == "flags") {
             return flags();
         }
+        else if (name == "ldflags") {
+            return ldflags();
+        }
         else if (name == "modules") {
             return modulesString();
         }
@@ -388,6 +391,24 @@ public:
         _isChangedTimeCurrent = true;
     }
 
+    std::string ldflags() const {
+        if (_ldflags.empty()) {
+            if (_parent) {
+                return _parent->ldflags();
+            }
+            else {
+                return {};
+            }
+        }
+        else {
+            return _ldflags;
+        }
+    }
+
+    void ldflags(std::string value) {
+        _ldflags = value;
+    }
+
     std::string flags() const {
         if (_flags.empty()) {
             if (_parent) {
@@ -401,6 +422,7 @@ public:
             return _flags;
         }
     }
+
 
     bool isRoot() {
         return _command == "[root]";
@@ -516,6 +538,7 @@ private:
     std::string _command;                         // If empty use parents
     std::map<std::string, std::string> _commands; // Parents build command
     std::string _flags;
+    std::string _ldflags;
     std::vector<std::string> _includes;
     std::string _includePrefix;
 
