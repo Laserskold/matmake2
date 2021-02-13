@@ -16,10 +16,10 @@ jobs:
     - name: git submodules
       run: git submodule update --init
     - name: install stuff
-      run: sudo apt update && sudo apt-get install g++-10
+      run: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh &&  sudo ./llvm.sh 11
     - name: build
-      run: ./build-linux.sh g++-10
+      run: ./build-linux.sh clang++-10
       shell: bash
     - name: self build
-      run: build/matmake2 -t gcc
+      run: build/matmake2 -t clang
 
