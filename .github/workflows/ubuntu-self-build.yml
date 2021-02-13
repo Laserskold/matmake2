@@ -16,7 +16,7 @@ jobs:
     - name: git submodules
       run: git submodule update --init
     - name: install stuff
-      run: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh &&  sudo ./llvm.sh 11
+      run: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh &&  sudo ./llvm.sh 10
     - name: build
       run: ./build-linux.sh clang++-10
       shell: bash
