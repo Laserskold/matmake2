@@ -64,7 +64,12 @@ public:
             return _out;
         }
         else {
-            return dir() / _out;
+            auto path = dir() / _out;
+            auto ext = extensionFromCommandType(_command, _flagStyle);
+            if (!ext.empty()) {
+                path.replace_extension(ext);
+            }
+            return path;
         }
     }
 
@@ -155,10 +160,16 @@ public:
     }
 
     std::string property(std::string name) const {
+        if (name.empty()) {
+            return {};
+        }
         if (name.rfind("parent.") == 0) {
             if (_parent) {
                 return _parent->property(name.substr(7));
             }
+        }
+        else if (name.front() == '.') {
+            return ::extension(name, _flagStyle);
         }
         else if (name == "command") {
             return _command;
@@ -295,6 +306,14 @@ public:
             throw std::runtime_error{"could not find " + name + " on target " +
                                      this->name()};
         }
+    }
+
+    std::string extension() const {
+        auto command = this->command();
+        if (!command.empty()) {
+            extensionFromCommandType(command, _flagStyle);
+        }
+        return {};
     }
 
     void cxx(filesystem::path cxx) {

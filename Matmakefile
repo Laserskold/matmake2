@@ -1,7 +1,6 @@
 # Matmake v2
 
 matmake2
-  name = matmake2
   out = matmake2
   src =
     src/*.cpp
@@ -14,7 +13,6 @@ matmake2
   copy = demos
 
 all
-  name = all
   in = @matmake2
   config =
     c++17

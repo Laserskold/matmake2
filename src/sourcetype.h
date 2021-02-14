@@ -32,6 +32,7 @@ inline const auto sourceTypeMap = std::map<filesystem::path, SourceType>{
     {".pcm", SourceType::PrecompiledModule},
 
     {".o", SourceType::Object},
+    {".obj", SourceType::Object},
 };
 
 inline SourceType getType(filesystem::path path) {

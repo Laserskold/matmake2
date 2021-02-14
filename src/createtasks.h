@@ -5,6 +5,7 @@
 #include "sourcetype.h"
 #include "task.h"
 #include "tasklist.h"
+#include "translateconfig.h"
 #include <memory>
 
 namespace task {
@@ -51,7 +52,9 @@ std::vector<filesystem::path> expandPaths(filesystem::path expression) {
 }
 
 //! The last item is the one that is expected to be linked to
-TaskList createTaskFromPath(filesystem::path path, bool useModules = true) {
+TaskList createTaskFromPath(filesystem::path path,
+                            FlagStyle style,
+                            bool useModules = true) {
     auto ret = TaskList{};
 
     auto type = SourceType{};
@@ -72,7 +75,7 @@ TaskList createTaskFromPath(filesystem::path path, bool useModules = true) {
 
         task.pushIn(&source);
 
-        task.out(path.string() + ".o");
+        task.out(path.string() + extension(".o", style));
 
         task.command("[cxx]");
 
@@ -110,7 +113,7 @@ TaskList createTaskFromPath(filesystem::path path, bool useModules = true) {
 
             task.pushIn(&precompiledModule);
 
-            task.out(precompiledPath.string() + ".o");
+            task.out(precompiledPath.string() + extension(".o", style));
 
             task.command("[cxxm]");
         }
@@ -120,7 +123,7 @@ TaskList createTaskFromPath(filesystem::path path, bool useModules = true) {
 
             task.pushIn(&expandedSource);
 
-            task.out(path.string() + ".o");
+            task.out(path.string() + extension(".o", style));
 
             task.command("[cxx]");
         }
@@ -167,12 +170,12 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
         task.command(p->value());
     }
     if (auto p = root.property("src")) {
-
+        // Requires command to be red before becauso of flag style
         for (auto &src : p->values) {
             auto paths = expandPaths(src);
 
             for (auto &path : paths) {
-                auto list = createTaskFromPath(path);
+                auto list = createTaskFromPath(path, task.flagStyle());
                 if (!list.empty()) {
                     task.pushIn(&list.back());
                     taskList.insert(std::move(list));

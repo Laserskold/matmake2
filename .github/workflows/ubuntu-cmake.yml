@@ -29,6 +29,6 @@ jobs:
       working-directory: build
       run: ninja
     - name: test
-      run: ctest
+      run: ctest --verbose
       working-directory: build
       

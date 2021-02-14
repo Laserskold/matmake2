@@ -70,7 +70,7 @@ main
 
     auto &first = json.front();
 
-    ASSERT_EQ(first.name, "main");
+    ASSERT_EQ(first["name"].string(), "main");
     ASSERT_EQ(first.type, Json::Object);
     ASSERT_EQ(first["in"].string(), "src/*.cpp");
     ASSERT_EQ(first["out"].string(), "main");
@@ -93,7 +93,7 @@ main
 
     auto &first = json.front();
 
-    ASSERT_EQ(first.name, "main");
+    ASSERT_EQ(first["name"].string(), "main");
     ASSERT_EQ(first.type, Json::Object);
     ASSERT_EQ(first["out"].string(), "main");
 
