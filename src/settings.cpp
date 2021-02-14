@@ -14,6 +14,7 @@ options:
 --target -t [target]  select target (eg g++, clang++, msvc)
 --clean               remove all built file
 --list                list available targets
+--test                run all targets marked with [test]
 
 developer options:
 --tasks [taskfile]    build a task json-file
@@ -72,6 +73,9 @@ Settings::Settings(int argc, char **argv) {
         }
         else if (arg == "--list" || arg == "-l") {
             command = Command::List;
+        }
+        else if (arg == "--test") {
+            command = Command::BuildAndTest;
         }
     }
 }

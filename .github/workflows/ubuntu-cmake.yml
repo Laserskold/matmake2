@@ -17,6 +17,8 @@ jobs:
       run: git submodule update --init
     - name: install stuff
       run: sudo apt update && sudo apt-get install ninja-build g++-10
+    - name: install stuff
+      run: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh &&  sudo ./llvm.sh 11
     - name: create build dir
       run: mkdir build
     - name: cmake

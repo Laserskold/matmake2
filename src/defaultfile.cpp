@@ -13,7 +13,7 @@ const char *defaultCompilerSource = R"_(
     "includeprefix": "-I",
     "commands": {
       "cxx": "{c++} -x c++ {src} {modules} -o {out} -c {depfile} {cxxflags} {flags} {includes}",
-      "exe": "{c++} {in} -o {out} {ldflags} {includes}",
+      "exe": "{c++} {in} -o {out} {ldflags} {flags} {includes}",
       "gch": "{c++} {in} -o {out} {depfile} {cxxflags} {flags} {includes}",
       "eem": "{c++} {in} {standard} {includes} -E > {out}",
       "pcm": "{c++} {cxxflags} {flags} {includes} {modules} --precompile -x c++-module {src} -o {out} ",
@@ -30,7 +30,7 @@ const char *defaultCompilerSource = R"_(
     "includeprefix": "-I",
     "commands": {
       "cxx": "{c++} -x c++ {src} {modules} -o {out} -c {depfile} {cxxflags} {flags} {includes}",
-      "exe": "{c++} {in} -o {out} {ldflags} {includes}",
+      "exe": "{c++} {in} -o {out} {ldflags} {flags} {includes}",
       "gch": "{c++} {in} -o {out} {depfile} {cxxflags} {flags} {includes}",
       "eem": "{c++} {in} {standard} {includes} -E > {out}",
       "pcm": "{c++} {cxxflags} {flags} {includes} {modules} --precompile -x c++-module {src} -o {out} ",

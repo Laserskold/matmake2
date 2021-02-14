@@ -296,6 +296,9 @@ public:
         if (name == "none") {
             return "";
         }
+        else if (name == "test") {
+            return commandAt("exe");
+        }
         else if (auto f = _commands.find(name); f != _commands.end()) {
             return f->second;
         }
@@ -502,6 +505,10 @@ public:
 
     bool isRoot() {
         return _command == "[root]";
+    }
+
+    bool isTest() {
+        return _command == "[test]";
     }
 
     //! Remove triggers that is raw or fresh
