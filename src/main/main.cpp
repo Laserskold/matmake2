@@ -99,7 +99,7 @@ int test(const TaskList &tasks, const Settings &settings) {
             auto exe = task->out();
             auto path = exe.parent_path();
             auto command = exe.filename();
-            if (execute(command, path)) {
+            if (execute(command.string(), path)) {
                 std::cout << "failed...";
             }
             else {
