@@ -5,15 +5,34 @@ matmake2
   src =
     src/*.cpp
     src/main/*.cpp
-  includes =
-    src
-    lib/json.h/include
   command = [exe]
   ldflags = -pthread
   copy = demos
 
+# This will be simplified in the future
+task_test
+  out = task_test
+  src =
+    src/*.cpp
+    test/task_test.cpp
+  command = [test]
+
+build_test
+  out = build_test
+  src =
+    src/*.cpp
+    test/build_test.cpp
+  command = [test]
+
 all
-  in = @matmake2
+  in =
+    @matmake2
+    @task_test
+    @build_test
+  includes =
+    src
+    lib/json.h/include
+    test
   config =
     c++17
     Wall

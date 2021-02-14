@@ -6,10 +6,12 @@ namespace {
 const std::map<std::string, std::string> gccConfigs = {
     {"debug", "-g"},
     {"modules", "-fmodules-ts"},
+    {"thread", "-pthread"},
 };
 const std::map<std::string, std::string> msvcConfigs = {
     {"debug", "/DEBUG"},
     {"modules", "/std:latest"},
+    {"thread", ""},
 };
 
 const std::map<std::string, std::string> gccExtensions = {
@@ -49,11 +51,12 @@ std::string translateStandard(std::string config, FlagStyle style) {
 }
 
 std::string osExeExtension() {
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-    return ".exe";
-#else
-    return {};
-#endif
+    if constexpr (getOs() == Os::Windows) {
+        return ".exe";
+    }
+    else {
+        return {};
+    }
 }
 
 } // namespace

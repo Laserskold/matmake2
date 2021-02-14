@@ -5,6 +5,7 @@
 
 enum class Command {
     Build,
+    BuildAndTest,
     ParseTasks,
     Clean,
     List,
