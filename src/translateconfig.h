@@ -11,3 +11,7 @@ enum class FlagStyle {
 std::string translateConfig(std::string config, FlagStyle);
 
 std::string includePrefix(FlagStyle);
+
+std::string extension(std::string ext, FlagStyle);
+
+std::string extensionFromCommandType(std::string command, FlagStyle);
