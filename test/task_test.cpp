@@ -28,4 +28,21 @@ TEST_CASE("property: modules") {
     ASSERT_EQ(main.property("modules").find("main.cpp"), std::string::npos);
 }
 
+TEST_CASE("property: config") {
+    auto src = Task{};
+
+    auto main = Task{};
+    main.pushIn(&src);
+
+    main.config({"c++11"});
+
+    ASSERT_EQ(src.property("standard"), "-std=c++11");
+    ASSERT_EQ(src.property("flags"), "-std=c++11");
+
+    main.flagStyle("msvc");
+
+    ASSERT_EQ(src.property("standard"), "/std:c++11");
+    ASSERT_EQ(src.property("flags"), "/std:c++11");
+}
+
 TEST_SUIT_END

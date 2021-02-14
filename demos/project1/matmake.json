@@ -2,7 +2,6 @@
   {
     "name": "main",
     "out": "main.exe",
-    "flags": "{parent.flags} -Wall",
     "pch" : [ "include/precompiled.hpp" ],
     "src": [ "src/*.cpp", "src/*.cppm" ],
     "copy": [

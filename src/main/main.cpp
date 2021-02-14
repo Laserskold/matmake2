@@ -11,17 +11,15 @@
 
 auto createTasksFromMatmakefile = [](const Settings &settings) -> TaskList {
     auto getJson = [&]() -> Json {
-        if (settings.matmakeFile.extension() == ".json") {
-
-            if (!filesystem::exists(settings.matmakeFile)) {
-                std::cerr << "no matmakefile found in directory\n";
-                return {};
-            }
-
-            return Json::LoadFile(settings.matmakeFile.string());
+        if (filesystem::exists("Matmakefile")) {
+            return parseMatmakefile("Matmakefile");
+        }
+        else if (filesystem::exists("matmake.json")) {
+            return Json::LoadFile("matmake.json");
         }
         else {
-            return parseMatmakefile(settings.matmakeFile);
+            std::cerr << "no matmakefile found in directory\n";
+            return {};
         }
     };
 
@@ -117,7 +115,13 @@ int main(int argc, char **argv) {
         }
     } break;
     case Command::List: {
-        auto json = Json::LoadFile(settings.matmakeFile.string());
+        auto json = [] {
+            if (filesystem::exists("Matmakefile")) {
+                return parseMatmakefile("Matmakefile");
+            }
+
+            return Json::LoadFile("matmake.json");
+        }();
 
         auto matmakeFile = MatmakeFile{json};
 

@@ -1,8 +1,6 @@
 #include "parsematmakefile.h"
 #include "line.h"
 
-namespace {} // namespace
-
 Json parseMatmakefile(std::istream &file) {
 
     auto json = Json{Json::Array};

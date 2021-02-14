@@ -18,3 +18,4 @@ all
     Wall
     Wpedantic
     modules
+    c++17

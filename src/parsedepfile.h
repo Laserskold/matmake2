@@ -3,6 +3,7 @@
 #include "filesystem.h"
 #include <fstream>
 #include <sstream>
+#include <vector>
 
 struct DepFileContent {
     std::vector<filesystem::path> deps;

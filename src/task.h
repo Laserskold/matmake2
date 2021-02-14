@@ -3,6 +3,7 @@
 #include "filesystem.h"
 #include "processedcommand.h"
 #include "sourcetype.h"
+#include "translateconfig.h"
 #include <algorithm>
 #include <chrono>
 #include <map>
@@ -18,6 +19,16 @@ enum class TaskState {
     DirtyWaiting,
     Done,
 };
+
+inline std::string join(std::string a, std::string b) {
+    if (a.empty()) {
+        return b;
+    }
+    else if (b.empty()) {
+        return a;
+    }
+    return a + " " + b;
+}
 
 class Task {
 public:
@@ -176,7 +187,7 @@ public:
             return cxx().string();
         }
         else if (name == "flags") {
-            return flags();
+            return join(flags(), config());
         }
         else if (name == "ldflags") {
             return ldflags();
@@ -187,17 +198,15 @@ public:
         else if (name == "includes") {
             return includes();
         }
+        else if (name == "standard") {
+            return standard();
+        }
         return {};
     }
 
     std::string includes() const {
-        if (_includes.empty()) {
-            if (_parent) {
-                return parent()->includes();
-            }
-            else {
-                return {};
-            }
+        if (_includes.empty() && _parent) {
+            return parent()->includes();
         }
         else {
             return concatIncludes();
@@ -229,13 +238,8 @@ public:
     }
 
     std::string includePrefix() const {
-        if (_includePrefix.empty()) {
-            if (_parent) {
-                return parent()->includePrefix();
-            }
-            else {
-                return {};
-            }
+        if (_includePrefix.empty() && _parent) {
+            return parent()->includePrefix();
         }
         else {
             return _includePrefix;
@@ -395,35 +399,83 @@ public:
     }
 
     std::string ldflags() const {
-        if (_ldflags.empty()) {
-            if (_parent) {
-                return _parent->ldflags();
-            }
-            else {
-                return {};
-            }
+        if (_ldflags.empty() && _parent) {
+            return _parent->ldflags();
         }
-        else {
-            return _ldflags;
-        }
+
+        return _ldflags;
     }
 
     void ldflags(std::string value) {
         _ldflags = value;
     }
 
-    std::string flags() const {
-        if (_flags.empty()) {
-            if (_parent) {
-                return _parent->flags();
-            }
-            else {
-                return {};
-            }
+    void config(std::vector<std::string> value) {
+        _config = value;
+    }
+
+    std::string config() const {
+        std::ostringstream ss;
+        if (_parent) {
+            ss << _parent->config();
+        }
+
+        for (auto &c : _config) {
+            ss << translateConfig(c, _flagStyle) << " ";
+        }
+
+        auto str = ss.str();
+        if (!str.empty() && isspace(str.back())) {
+            str.pop_back();
+        }
+        return str;
+    }
+
+    FlagStyle flagStyle() const {
+        if (_flagStyle == FlagStyle::Inherit && _parent) {
+            return _parent->flagStyle();
+        }
+
+        return _flagStyle;
+    }
+
+    void flagStyle(FlagStyle value) {
+        _flagStyle = value;
+    }
+
+    void flagStyle(std::string value) {
+        if (value == "msvc") {
+            _flagStyle = FlagStyle::Msvc;
         }
         else {
-            return _flags;
+            _flagStyle = FlagStyle::Gcc;
         }
+    }
+
+    //! In some cases you only need to know the c++-standard
+    //! Notice the reverse order, because we want to catch the latest
+    //! config that is specified
+    std::string standard() const {
+        auto f = std::find_if(_config.rbegin(), _config.rend(), [](auto &x) {
+            return x.rfind("c++") != std::string::npos;
+        });
+
+        if (f != _config.rend()) {
+            return translateConfig(*f, flagStyle());
+        }
+        else if (_parent) {
+            return _parent->standard();
+        }
+
+        return {};
+    }
+
+    std::string flags() const {
+        if (_flags.empty() && _parent) {
+            return _parent->flags();
+        }
+
+        return _flags;
     }
 
     void flags(std::string flags) {
@@ -431,17 +483,11 @@ public:
     }
 
     std::string depprefix() const {
-        if (_depprefix.empty()) {
-            if (_parent) {
-                return _parent->depprefix();
-            }
-            else {
-                return {};
-            }
+        if (_depprefix.empty() && _parent) {
+            return _parent->depprefix();
         }
-        else {
-            return _depprefix;
-        }
+
+        return _depprefix;
     }
 
     void depprefix(std::string value) {
@@ -562,6 +608,8 @@ private:
     std::string _depprefix;
     std::vector<std::string> _includes;
     std::string _includePrefix;
+    std::vector<std::string> _config;
+    FlagStyle _flagStyle = FlagStyle::Inherit;
 
     // Fixed during connection step
     std::vector<Task *> _in; // Files that needs to be built before this file

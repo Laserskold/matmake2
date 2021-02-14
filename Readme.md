@@ -17,12 +17,41 @@ build a executable named `main` or `main.exe`  (depending on platform)
 ```make
 
 main
-    src = *.cpp *.cppm
-    out = main
-    config = c++20 modules
+   src = *.cpp *.cppm
+   out = main
+   config = c++20 modules
+    
+all:
+  in = @main
 
 ```
 
+
+Example of more complicated file:
+
+```make
+
+main
+  src =
+    *.cpp
+    *.cppm
+  out = main       # On windows ".exe" will be added to this name
+   
+  
+
+gcc
+  in = @main       # Specify that when building "gcc" main will be built
+  config
+    c++17
+    modules
+    Wall
+    Wpedantic
+    debug          # Compile with debug information
+  flagstyle = gcc  # gcc or msvc: how the flags look. Like "-Iinclude" or like "/Iinclude"
+    
+  
+
+```
 
 Building on Linux
 ------------------

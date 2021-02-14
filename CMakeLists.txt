@@ -27,6 +27,7 @@ add_library(
    "src/defaultfile.cpp"
    "src/defaultfile.h"
    "src/parsematmakefile.cpp"
+   "src/translateconfig.cpp"
 )
 
 link_libraries(matmake2-core  ${CMAKE_THREAD_LIBS_INIT})

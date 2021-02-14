@@ -200,6 +200,12 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
     if (auto p = root.property("includeprefix")) {
         task.includePrefix(p->value());
     }
+    if (auto p = root.property("config")) {
+        task.config(p->values);
+    }
+    if (auto p = root.property("flagstyle")) {
+        task.flagStyle(p->value());
+    }
     {
         auto &commands = root.ocommands();
 

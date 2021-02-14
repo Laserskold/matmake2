@@ -2,6 +2,7 @@
 #include "createtasks.h"
 #include "filesystem.h"
 #include "mls-unit-test/unittest.h"
+#include "parsematmakefile.h"
 
 const auto workingDirectory = filesystem::current_path();
 
@@ -18,7 +19,7 @@ void setupProject() {
 }
 
 auto getTasks() {
-    const auto json = Json::LoadFile((testPath / "matmake.json").string());
+    auto json = parseMatmakefile((testPath / "Matmakefile").string());
 
     auto matmakefile = MatmakeFile{json};
 
