@@ -12,7 +12,6 @@ enum class Command {
 
 struct Settings {
     filesystem::path taskFile;
-    filesystem::path matmakeFile = "Matmakefile";
     bool printTree = false;
     bool printTasks = false;
     bool verbose = false;

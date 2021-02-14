@@ -58,6 +58,12 @@ void Task::parse(const Json &jtask) {
     if (auto f = jsonFind("depprefix")) {
         depprefix(f->string());
     }
+    if (auto f = jsonFind("flagStyle")) {
+        flagStyle(f->string());
+    }
+    if (auto f = jsonFind("config")) {
+        config(*f);
+    }
 }
 
 Json Task::dump() {
@@ -93,6 +99,10 @@ Json Task::dump() {
             }
             j.push_back(ij);
         }
+    }
+
+    if (!_config.empty()) {
+        json["config"].vector(_config);
     }
 
     if (!_commands.empty()) {
