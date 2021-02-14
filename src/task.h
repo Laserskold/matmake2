@@ -216,7 +216,7 @@ public:
     std::string concatIncludes() const {
         std::ostringstream ss;
 
-        auto includePrefix = this->includePrefix();
+        auto includePrefix = ::includePrefix(_flagStyle);
 
         for (auto &i : _includes) {
             ss << includePrefix << i << " ";
@@ -231,19 +231,6 @@ public:
 
     void depfile(filesystem::path path) {
         _depfile = path;
-    }
-
-    void includePrefix(std::string includePrefix) {
-        _includePrefix = includePrefix;
-    }
-
-    std::string includePrefix() const {
-        if (_includePrefix.empty() && _parent) {
-            return parent()->includePrefix();
-        }
-        else {
-            return _includePrefix;
-        }
     }
 
     filesystem::path depfile() const {
@@ -607,7 +594,6 @@ private:
     std::string _ldflags;
     std::string _depprefix;
     std::vector<std::string> _includes;
-    std::string _includePrefix;
     std::vector<std::string> _config;
     FlagStyle _flagStyle = FlagStyle::Inherit;
 
