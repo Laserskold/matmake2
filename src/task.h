@@ -65,7 +65,10 @@ public:
         }
         else {
             auto path = dir() / _out;
-            path.replace_extension(extensionFromCommandType(_command, _flagStyle));
+            auto ext = extensionFromCommandType(_command, _flagStyle);
+            if (!ext.empty()) {
+                path.replace_extension(ext);
+            }
             return path;
         }
     }

@@ -111,7 +111,7 @@ std::string extension(std::string ext, FlagStyle style) {
         }
         break;
     }
-    return {};
+    return ext;
 }
 
 std::string extensionFromCommandType(std::string command, FlagStyle style) {
@@ -120,7 +120,7 @@ std::string extensionFromCommandType(std::string command, FlagStyle style) {
     }
 
     if (command.front() == '[' && command.back() == ']') {
-        command = command.substr(1, command.size() - 1);
+        command = command.substr(1, command.size() - 2);
     }
 
     if (command == "exe") {

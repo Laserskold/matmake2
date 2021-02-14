@@ -52,7 +52,9 @@ std::vector<filesystem::path> expandPaths(filesystem::path expression) {
 }
 
 //! The last item is the one that is expected to be linked to
-TaskList createTaskFromPath(filesystem::path path, FlagStyle style, bool useModules = true) {
+TaskList createTaskFromPath(filesystem::path path,
+                            FlagStyle style,
+                            bool useModules = true) {
     auto ret = TaskList{};
 
     auto type = SourceType{};
@@ -168,7 +170,7 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
         task.command(p->value());
     }
     if (auto p = root.property("src")) {
-
+        // Requires command to be red before becauso of flag style
         for (auto &src : p->values) {
             auto paths = expandPaths(src);
 

@@ -23,7 +23,7 @@ Json parseMatmakefile(std::istream &file) {
             }
             else {
                 finishTarget();
-                lastTarget.name = line.name;
+                lastTarget["name"] = line.name;
             }
             break;
         case Line::Assignment:
