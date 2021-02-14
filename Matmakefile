@@ -17,8 +17,8 @@ all
   name = all
   in = @matmake2
   config =
+    c++17
     Wall
     Wpedantic
-    modules
     thread
 
