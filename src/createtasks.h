@@ -132,8 +132,10 @@ TaskList createTaskFromPath(filesystem::path path,
     return ret;
 }
 
-std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
-                                       const MatmakeNode &root) {
+std::pair<TaskList, Task *> createTree(
+    const MatmakeFile &file,
+    const MatmakeNode &root,
+    std::map<filesystem::path, Task *> &duplicateMap) {
     TaskList taskList;
 
     auto in = root.property("in");
@@ -153,7 +155,7 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
                 throw std::runtime_error{"could not find name " + name +
                                          " at " + std::string{in->pos}};
             }
-            auto tree = createTree(file, *f);
+            auto tree = createTree(file, *f, duplicateMap);
             task.pushIn(tree.second);
             taskList.insert(std::move(tree.first));
         }
@@ -175,10 +177,16 @@ std::pair<TaskList, Task *> createTree(const MatmakeFile &file,
             auto paths = expandPaths(src);
 
             for (auto &path : paths) {
-                auto list = createTaskFromPath(path, task.flagStyle());
-                if (!list.empty()) {
-                    task.pushIn(&list.back());
-                    taskList.insert(std::move(list));
+                if (auto f = duplicateMap.find(path); f != duplicateMap.end()) {
+                    task.pushIn(f->second);
+                }
+                else {
+                    auto list = createTaskFromPath(path, task.flagStyle());
+                    if (!list.empty()) {
+                        task.pushIn(&list.back());
+                        duplicateMap[path] = &list.back();
+                        taskList.insert(std::move(list));
+                    }
                 }
             }
         }
@@ -226,7 +234,9 @@ TaskList createTasks(const MatmakeFile &file, std::string rootName) {
         if (auto command = node.property("command")) {
             if (command->value() == "[root]") {
                 if (node.name() == rootName) {
-                    auto tasks = task::createTree(file, node).first;
+                    auto duplicateMap = std::map<filesystem::path, Task *>{};
+                    auto tasks =
+                        task::createTree(file, node, duplicateMap).first;
                     prescan(tasks);
                     calculateState(tasks);
                     return tasks;
