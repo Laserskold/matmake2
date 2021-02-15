@@ -41,7 +41,7 @@ main
 
 gcc
   in = @main       # Specify that when building "gcc" main will be built
-  config
+  config =
     c++17
     modules
     Wall
