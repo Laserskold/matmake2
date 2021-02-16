@@ -30,7 +30,11 @@ add_library(
    "src/translateconfig.cpp"
 )
 
-link_libraries(matmake2-core  ${CMAKE_THREAD_LIBS_INIT})
+add_subdirectory(lib/json.h)
+
+target_link_libraries(matmake2-core PUBLIC json)
+
+link_libraries(matmake2-core  ${CMAKE_THREAD_LIBS_INIT} )
 
 add_executable (
    matmake2
@@ -39,7 +43,6 @@ add_executable (
 
 include_directories(
    "${CMAKE_SOURCE_DIR}/src"
-   "${CMAKE_SOURCE_DIR}/lib/json.h/include"
    )
 
 target_precompile_headers(matmake2-core PUBLIC "src/precompiled.h")
