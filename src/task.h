@@ -206,6 +206,9 @@ public:
         else if (name == "ldflags") {
             return ldflags();
         }
+        else if (name == "eflags") {
+            return eflags();
+        }
         else if (name == "modules") {
             return modulesString();
         }
@@ -438,6 +441,19 @@ public:
         _ldflags = value;
     }
 
+    //! Flags used when preprocessing files
+    std::string eflags() const {
+        if (_eflags.empty() && _parent) {
+            return _parent->eflags();
+        }
+
+        return _eflags;
+    }
+
+    void eflags(std::string value) {
+        _eflags = value;
+    }
+
     void config(std::vector<std::string> value) {
         _config = value;
     }
@@ -638,6 +654,7 @@ private:
     std::map<std::string, std::string> _commands; // Parents build command
     std::string _flags;
     std::string _ldflags;
+    std::string _eflags;
     std::string _depprefix;
     std::vector<std::string> _includes;
     std::vector<std::string> _config;

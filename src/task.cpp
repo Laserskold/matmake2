@@ -56,7 +56,10 @@ void Task::parse(const Json &jtask) {
         flags(f->string());
     }
     if (auto f = jsonFind("ldflags")) {
-        flags(f->string());
+        ldflags(f->string());
+    }
+    if (auto f = jsonFind("eflags")) {
+        eflags(f->string());
     }
     if (auto f = jsonFind("depprefix")) {
         depprefix(f->string());
@@ -87,6 +90,7 @@ Json Task::dump() {
     attachValue("cc", _cc.string());
     attachValue("flags", _flags);
     attachValue("ldflags", _ldflags);
+    attachValue("eflags", _ldflags);
     attachValue("depprefix", _depprefix);
 
     if (!_in.empty()) {
@@ -181,13 +185,6 @@ void Task::print(bool verbose, size_t indentation) {
             in->print(verbose, indentation + 1);
         }
     }
-
-    //    if (!triggers().empty()) {
-    //        indent() << "triggers:\n";
-    //        for (auto &trigger : triggers()) {
-    //            trigger->print(verbose, indentation + 1);
-    //        }
-    //    }
 
     indent() << " -- \n";
 }

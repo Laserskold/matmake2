@@ -17,6 +17,7 @@ Json parseMatmakefile(std::istream &file) {
     for (auto line = Line{file}; line.type != Line::End; line = Line{file}) {
         switch (line.type) {
         case Line::Normal:
+            // Something without '='
             if (lastTarget.size() > 0 && line.indent > 0) {
                 lastTarget.back().emplace_back(Json{line.name});
                 lastTarget.back().type = Json::Array;
@@ -27,7 +28,15 @@ Json parseMatmakefile(std::istream &file) {
             }
             break;
         case Line::Assignment:
-            if (line.value.size() == 1) {
+            // For example "x = y"
+            if (!line.name.empty() && !line.value.empty() &&
+                line.name.front() == '-') {
+                // Some flags like "-stdlib=c++"
+                lastTarget.back().emplace_back(
+                    Json{line.name + "=" + line.value.front()});
+                lastTarget.back().type = Json::Array;
+            }
+            else if (line.value.size() == 1) {
                 lastTarget[line.name] = line.value.front();
             }
             else if (line.value.size() > 1) {
@@ -36,6 +45,7 @@ Json parseMatmakefile(std::istream &file) {
             }
             break;
         case Line::UnfinishedAssignment:
+            // For example "  x ="
         default:
             lastTarget[line.name];
             break;

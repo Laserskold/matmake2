@@ -16,7 +16,7 @@ const char *defaultCompilerSource = R"_(
       "cc": "{c++} -x c {src} -o {out} -c {cxxflags} {flags} {includes}",
       "exe": "{c++} {in} -o {out} {ldflags} {flags} {includes}",
       "gch": "{c++} {in} -o {out} {depfile} {cxxflags} {flags} {includes}",
-      "eem": "{c++} {in} {standard} {includes} -E > {out}",
+      "eem": "{c++} {in} {standard} {includes} {eflags} -E > {out}",
       "copy": "cp {in} {out}",
       "pcm": "{c++} {cxxflags} {flags} {includes} {modules} --precompile -x c++-module {src} -o {out} ",
       "cxxm": "{c++} {cxxflags} {flags} {includes} -c {in} -o {out} "
@@ -35,7 +35,7 @@ const char *defaultCompilerSource = R"_(
       "cc": "{c++} -x c {src} {modules} -o {out} -c {cxxflags} {flags} {includes}",
       "exe": "{c++} {in} -o {out} {ldflags} {flags} {includes}",
       "gch": "{c++} {in} -o {out} {depfile} {cxxflags} {flags} {includes}",
-      "eem": "{c++} {in} {standard} {includes} -E > {out}",
+      "eem": "{c++} {in} {standard} {includes} {eflags} -E > {out}",
       "copy": "cp {in} {out}",
       "pcm": "{c++} {cxxflags} {flags} {includes} {modules} --precompile -x c++-module {src} -o {out} ",
       "cxxm": "{c++} {cxxflags} {flags} {includes} -c {in} -o {out} "

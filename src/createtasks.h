@@ -203,6 +203,9 @@ std::pair<TaskList, Task *> createTree(
     if (auto p = root.property("ldflags")) {
         task.ldflags(p->concat());
     }
+    if (auto p = root.property("eflags")) {
+        task.eflags(p->concat());
+    }
     if (auto p = root.property("includes")) {
         for (auto &include : p->values) {
             task.pushInclude(include);
