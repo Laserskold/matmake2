@@ -9,6 +9,7 @@ enum class SourceType {
     Header,
     CxxHeader,
     CxxSource,
+    CSource,
     ModuleSource,
     ExpandedModuleSource,
     PrecompiledModule,
@@ -24,7 +25,7 @@ inline const auto sourceTypeMap = std::map<filesystem::path, SourceType>{
     {".cxx", SourceType::CxxSource},
     {".cc", SourceType::CxxSource},
 
-    {".c", SourceType::CxxSource}, // Todo: Add support for separate c-compiler
+    {".c", SourceType::CSource},
 
     {".cppm", SourceType::ModuleSource},
     {".cxxm", SourceType::ModuleSource},

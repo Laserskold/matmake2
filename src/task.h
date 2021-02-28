@@ -197,6 +197,9 @@ public:
         else if (name == "c++") {
             return cxx().string();
         }
+        else if (name == "cc") {
+            return cc().string();
+        }
         else if (name == "flags") {
             return join(flags(), config());
         }
@@ -329,6 +332,22 @@ public:
         }
         else if (_parent) {
             return _parent->cxx();
+        }
+        else {
+            return {};
+        }
+    }
+
+    void cc(filesystem::path cc) {
+        _cc = cc;
+    }
+
+    filesystem::path cc() const {
+        if (!_cc.empty()) {
+            return _cc;
+        }
+        else if (_parent) {
+            return _parent->cc();
         }
         else {
             return {};
@@ -613,6 +632,7 @@ private:
     filesystem::path _dir;
     filesystem::path _depfile;
     filesystem::path _cxx;
+    filesystem::path _cc;
     std::string _name;                            // If empty-same as out
     std::string _command;                         // If empty use parents
     std::map<std::string, std::string> _commands; // Parents build command

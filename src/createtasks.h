@@ -94,7 +94,7 @@ TaskList createTaskFromPath(filesystem::path path,
 
         expandedSource.command("[none]");
 
-        if (getType(path) == SourceType::ModuleSource) {
+        if (type == SourceType::ModuleSource) {
 
             auto &precompiledModule = ret.emplace();
 
@@ -125,7 +125,7 @@ TaskList createTaskFromPath(filesystem::path path,
 
             task.out(path.string() + extension(".o", style));
 
-            task.command("[cxx]");
+            task.command((type == SourceType::CSource) ? "[cc]" : "[cxx]");
         }
     }
 
@@ -167,6 +167,9 @@ std::pair<TaskList, Task *> createTree(
     }
     if (auto p = root.property("cxx")) {
         task.cxx(p->value());
+    }
+    if (auto p = root.property("cc")) {
+        task.cc(p->value());
     }
     if (auto p = root.property("command")) {
         task.command(p->value());

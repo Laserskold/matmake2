@@ -45,4 +45,16 @@ TEST_CASE("property: config") {
     ASSERT_EQ(src.property("flags"), "/std:c++11");
 }
 
+TEST_CASE("property: compiler") {
+    auto task = Task{};
+
+    task.cc("c-compiler");
+    ASSERT_EQ(task.cc(), "c-compiler");
+    ASSERT_EQ(task.property("cc"), "c-compiler");
+
+    task.cxx("c++-compiler");
+    ASSERT_EQ(task.cxx(), "c++-compiler");
+    ASSERT_EQ(task.property("c++"), "c++-compiler");
+}
+
 TEST_SUIT_END

@@ -157,7 +157,16 @@ PrescanResult prescan(Task &task) {
         return std::move(*p);
     }
 
-    auto command = ProcessedCommand{task.commandAt("eem")}.expand(task);
+    // Sometimes the source file needs to know which macros is included from
+    // header files to know if certain imports is to be done or not, therefore
+    // you might need to preprocess the whole file before searching for imports.
+    // This switch is for the cases when the expansion of files just causes
+    // trouble
+    const bool shouldExpand = true;
+
+    auto command =
+        ProcessedCommand{task.commandAt(shouldExpand ? "eem" : "copy")}.expand(
+            task);
 
     std::cout << "prescanning with: " << command << "\n";
 

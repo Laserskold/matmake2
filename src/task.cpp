@@ -49,6 +49,9 @@ void Task::parse(const Json &jtask) {
     if (auto f = jsonFind("c++")) {
         cxx(f->string());
     }
+    if (auto f = jsonFind("cc")) {
+        cc(f->string());
+    }
     if (auto f = jsonFind("flags")) {
         flags(f->string());
     }
@@ -81,6 +84,7 @@ Json Task::dump() {
     attachValue("depfile", _depfile.string());
     attachValue("command", _command);
     attachValue("cxx", _cxx.string());
+    attachValue("cc", _cc.string());
     attachValue("flags", _flags);
     attachValue("ldflags", _ldflags);
     attachValue("depprefix", _depprefix);
