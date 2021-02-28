@@ -24,6 +24,8 @@ inline const auto sourceTypeMap = std::map<filesystem::path, SourceType>{
     {".cxx", SourceType::CxxSource},
     {".cc", SourceType::CxxSource},
 
+    {".c", SourceType::CxxSource}, // Todo: Add support for separate c-compiler
+
     {".cppm", SourceType::ModuleSource},
     {".cxxm", SourceType::ModuleSource},
 
@@ -38,12 +40,6 @@ inline const auto sourceTypeMap = std::map<filesystem::path, SourceType>{
 inline SourceType getType(filesystem::path path) {
     if (auto f = sourceTypeMap.find(path.extension());
         f != sourceTypeMap.end()) {
-        //        if (f->second == SourceType::ModuleSource ||
-        //            f->second == SourceType::CxxSource) {
-        //            if (path.stem().extension() == ".eem") {
-        //                return SourceType::ExpandedModuleSource;
-        //            }
-        //        }
         return f->second;
     }
     else {
