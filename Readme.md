@@ -17,9 +17,14 @@ build a executable named `main` or `main.exe`  (depending on platform)
 ```make
 
 main
-   src = *.cpp *.cppm
+   src =
+     *.cpp
+     *.cppm
    out = main
-   config = c++20 modules
+   config =
+     c++20
+     modules
+   command = [exe]
     
 all:
   in = @main
@@ -36,7 +41,7 @@ main
     *.cpp
     *.cppm
   out = main       # On windows ".exe" will be added to this name
-   
+  command = [exe]
   
 
 gcc
@@ -108,4 +113,4 @@ https://clang.llvm.org/docs/Modules.html
 - [ ] Include matmakefiles from other directories
 - [ ] Trace command line arguments
 - [ ] Shared libraries
-- [ ] Static libraries
+- [/] Static libraries
