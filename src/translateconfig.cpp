@@ -31,13 +31,13 @@ const std::map<std::string, std::string> msvcExtensions = {
 const std::map<std::string, std::string> gccCmdToExt = {
     {"exe", ".exe"},
     {"so", ".so"},
-    {"a", ".a"},
+    {"static", ".a"},
 };
 
 const std::map<std::string, std::string> msvcCmdToExt = {
     {"exe", ".exe"},
     {"so", ".dll"},
-    {"a", ".lib"},
+    {"static", ".lib"},
 };
 
 //! Strings starting with "c++"
