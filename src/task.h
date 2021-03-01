@@ -200,6 +200,9 @@ public:
         else if (name == "cc") {
             return cc().string();
         }
+        else if (name == "static" || name == "ar") {
+            return ar().string();
+        }
         else if (name == "flags") {
             return join(flags(), config());
         }
@@ -351,6 +354,22 @@ public:
         }
         else if (_parent) {
             return _parent->cc();
+        }
+        else {
+            return {};
+        }
+    }
+
+    void ar(filesystem::path ar) {
+        _ar = ar;
+    }
+
+    filesystem::path ar() const {
+        if (!_ar.empty()) {
+            return _ar;
+        }
+        else if (_parent) {
+            return _parent->ar();
         }
         else {
             return {};
@@ -649,6 +668,7 @@ private:
     filesystem::path _depfile;
     filesystem::path _cxx;
     filesystem::path _cc;
+    filesystem::path _ar;
     std::string _name;                            // If empty-same as out
     std::string _command;                         // If empty use parents
     std::map<std::string, std::string> _commands; // Parents build command

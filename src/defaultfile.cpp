@@ -8,6 +8,7 @@ const char *defaultCompilerSource = R"_(
     "name": "clang",
     "in": [ "@all" ],
     "cxx": "clang++-11",
+    "ar": "ar",
     "dir": "build/clang",
     "command": "[root]",
     "includeprefix": "-I",
@@ -19,13 +20,15 @@ const char *defaultCompilerSource = R"_(
       "eem": "{c++} {in} {standard} {includes} {eflags} -E > {out}",
       "copy": "cp {in} {out}",
       "pcm": "{c++} {cxxflags} {flags} {includes} {modules} --precompile -x c++-module {src} -o {out} ",
-      "cxxm": "{c++} {cxxflags} {flags} {includes} -c {in} -o {out} "
+      "cxxm": "{c++} {cxxflags} {flags} {includes} -c {in} -o {out} ",
+      "static": "{ar} -rs {out} {in}"
     }
   },
   {
     "name": "gcc",
     "in": [ "@all" ],
     "cxx": "g++",
+    "ar": "ar",
     "dir": "build/gcc",
     "flags": [ "-std=c++17" ],
     "command": "[root]",
@@ -38,7 +41,8 @@ const char *defaultCompilerSource = R"_(
       "eem": "{c++} {in} {standard} {includes} {eflags} -E > {out}",
       "copy": "cp {in} {out}",
       "pcm": "{c++} {cxxflags} {flags} {includes} {modules} --precompile -x c++-module {src} -o {out} ",
-      "cxxm": "{c++} {cxxflags} {flags} {includes} -c {in} -o {out} "
+      "cxxm": "{c++} {cxxflags} {flags} {includes} -c {in} -o {out} ",
+      "static": "{ar} -rs {out} {in}"
     }
   }
 ]
