@@ -1,0 +1,19 @@
+
+lib
+  src = lib/*.cpp
+  command = [static]
+  out = lib
+
+main
+  in = @lib
+  src = src/*.cpp
+  command = [exe]
+  out = main
+
+all
+  in =
+    @main
+  includes =
+    src
+    lib
+  config = c++17

@@ -145,25 +145,6 @@ std::pair<TaskList, Task *> createTree(
 
     auto &task = taskList.emplace();
 
-    if (in) {
-        for (auto name : in->values) {
-            if (name.empty()) {
-                continue;
-            }
-            else if (name.front() == '@') {
-                name = name.substr(1);
-            }
-            auto f = file.find(name);
-            if (!f) {
-                throw std::runtime_error{"could not find name " + name +
-                                         " at " + std::string{in->pos}};
-            }
-            auto tree = createTree(file, *f, duplicateMap);
-            task.pushIn(tree.second);
-            taskList.insert(std::move(tree.first));
-        }
-    }
-
     task.name(root.name());
     if (auto p = root.property("dir")) {
         task.dir(p->value());
@@ -198,6 +179,27 @@ std::pair<TaskList, Task *> createTree(
                     }
                 }
             }
+        }
+    }
+    if (in) {
+        // Its important that targets from in is included after src
+        // otherwise there could be problems with linking to for example .a
+        // files
+        for (auto name : in->values) {
+            if (name.empty()) {
+                continue;
+            }
+            else if (name.front() == '@') {
+                name = name.substr(1);
+            }
+            auto f = file.find(name);
+            if (!f) {
+                throw std::runtime_error{"could not find name " + name +
+                                         " at " + std::string{in->pos}};
+            }
+            auto tree = createTree(file, *f, duplicateMap);
+            task.pushIn(tree.second);
+            taskList.insert(std::move(tree.first));
         }
     }
     if (auto p = root.property("out")) {
@@ -246,6 +248,8 @@ TaskList createTasks(const MatmakeFile &file, std::string rootName) {
         if (auto command = node.property("command")) {
             if (command->value() == "[root]") {
                 if (node.name() == rootName) {
+                    // This map keeps track of o-files so that there is not
+                    // multiple versions of the same file
                     auto duplicateMap = std::map<filesystem::path, Task *>{};
                     auto tasks =
                         task::createTree(file, node, duplicateMap).first;
