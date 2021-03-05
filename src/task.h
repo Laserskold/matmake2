@@ -146,6 +146,20 @@ public:
         return _parent;
     }
 
+    //! Find the originating source file for this file
+    //! This is assumed to be run on ".o" files so that there is no ambiguity
+    Task *findSource() {
+        if (!_in.empty()) {
+            return _in.front()->findSource();
+        }
+        else if (_state == TaskState::Raw) {
+            return this;
+        }
+        else {
+            return nullptr;
+        }
+    }
+
     void dir(filesystem::path dir) {
         _dir = dir;
     }

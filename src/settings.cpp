@@ -15,6 +15,7 @@ options:
 --clean               remove all built file
 --list                list available targets
 --test                run all targets marked with [test]
+--compile-commands   output clang compile commands.json
 
 developer options:
 --tasks [taskfile]    build a task json-file
@@ -76,6 +77,9 @@ Settings::Settings(int argc, char **argv) {
         }
         else if (arg == "--test") {
             command = Command::BuildAndTest;
+        }
+        else if (arg == "--compile-commands") {
+            outputCompileCommands = true;
         }
     }
 }

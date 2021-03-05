@@ -32,7 +32,7 @@ TaskList createTasksFromMatmakefile(const Settings &settings) {
     }
 
     return createTasks(matmakeFile, settings.target);
-};
+}
 
 int parseTasksCommand(const Settings settings) {
     if (!settings.taskFile.empty()) {
@@ -111,6 +111,36 @@ int test(const TaskList &tasks, const Settings &settings) {
     return 0;
 }
 
+void outputCompileCommands(const TaskList &tasks) {
+    auto json = Json{Json::Array};
+
+    auto dir = filesystem::absolute(filesystem::current_path());
+    for (auto &task : tasks) {
+        if (getType(task->out()) != SourceType::Object) {
+            continue;
+        }
+        auto command = task->command();
+        auto taskJson = Json{Json::Object};
+
+        taskJson["directory"] = dir.string();
+        taskJson["command"] = ProcessedCommand{command}.expand(*task);
+        auto source = task->findSource();
+        if (!source) {
+            std::cerr << "could not find source file for " << task->out();
+            continue;
+        }
+        auto file = source->out().string();
+        if (file.rfind("./", 0) == 0) {
+            file = file.substr(2);
+        }
+        taskJson["file"] = file;
+
+        json.push_back(std::move(taskJson));
+    }
+
+    std::ofstream{"compile_commands.json"} << json;
+}
+
 int build(const Settings &settings) {
     auto tasks = createTasksFromMatmakefile(settings);
 
@@ -136,6 +166,10 @@ int build(const Settings &settings) {
 
         root->print(settings.verbose);
         std::cout.flush();
+    }
+
+    if (settings.outputCompileCommands) {
+        outputCompileCommands(tasks);
     }
 
     if (!settings.skipBuild) {

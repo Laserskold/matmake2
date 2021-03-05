@@ -18,6 +18,7 @@ struct Settings {
     bool verbose = false;
     bool debugPrint = false;
     bool skipBuild = false;
+    bool outputCompileCommands = false;
     std::string target = "";
 
     Command command = Command::Build;
