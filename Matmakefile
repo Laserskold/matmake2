@@ -38,4 +38,5 @@ all
     Wall
     Wpedantic
     thread
+    debug
 

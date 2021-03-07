@@ -11,7 +11,7 @@ const std::map<std::string, std::string> gccConfigs = {
 const std::map<std::string, std::string> msvcConfigs = {
     {"debug", "/DEBUG"},
     {"modules", "/std:latest"},
-    {"thread", ""},
+    {"thread", "/MD"}, // Use multithreaded standard library
 };
 
 const std::map<std::string, std::string> gccExtensions = {
@@ -99,7 +99,7 @@ std::string extension(std::string ext, FlagStyle style) {
     }
 
     if (ext == ".exe") {
-        return osExeExtension();
+        return translateString(TranslatableString::ExeExtension, style);
     }
 
     switch (style) {
@@ -126,7 +126,11 @@ std::string extensionFromCommandType(std::string command, FlagStyle style) {
         command = command.substr(1, command.size() - 2);
     }
 
-    if (command == "exe") {
+    if (command == "exe" || command == "test") {
+        if (style == FlagStyle::Msvc) {
+            // Guessing that if you run msvc on linux you do it through wine
+            return ".exe";
+        }
         return osExeExtension();
     }
     switch (style) {
@@ -141,5 +145,30 @@ std::string extensionFromCommandType(std::string command, FlagStyle style) {
         }
         break;
     }
+    return {};
+}
+
+std::string translateString(TranslatableString name, FlagStyle style) {
+    if (style == FlagStyle::Msvc) {
+        switch (name) {
+        case TranslatableString::ExeExtension:
+            return ".exe";
+        case TranslatableString::ObjectExtension:
+            return ".obj";
+        case TranslatableString::IncludeModuleString:
+            return "/module:reference ";
+        }
+    }
+    else {
+        switch (name) {
+        case TranslatableString::ExeExtension:
+            return "";
+        case TranslatableString::ObjectExtension:
+            return ".o";
+        case TranslatableString::IncludeModuleString:
+            return "-fmodule-file=";
+        }
+    }
+
     return {};
 }

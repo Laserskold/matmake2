@@ -138,7 +138,8 @@ TaskList createTaskFromPath(filesystem::path path,
 std::pair<TaskList, Task *> createTree(
     const MatmakeFile &file,
     const MatmakeNode &root,
-    std::map<filesystem::path, Task *> &duplicateMap) {
+    std::map<filesystem::path, Task *> &duplicateMap,
+    FlagStyle style) {
     TaskList taskList;
 
     auto in = root.property("in");
@@ -146,6 +147,13 @@ std::pair<TaskList, Task *> createTree(
     auto &task = taskList.emplace();
 
     task.name(root.name());
+
+    if (auto p = root.property("flagstyle")) {
+        // Needs to be first
+        task.flagStyle(p->value());
+
+        style = task.flagStyle();
+    }
     if (auto p = root.property("dir")) {
         task.dir(p->value());
     }
@@ -171,7 +179,7 @@ std::pair<TaskList, Task *> createTree(
                     task.pushIn(f->second);
                 }
                 else {
-                    auto list = createTaskFromPath(path, task.flagStyle());
+                    auto list = createTaskFromPath(path, style);
                     if (!list.empty()) {
                         task.pushIn(&list.back());
                         duplicateMap[path] = &list.back();
@@ -197,7 +205,7 @@ std::pair<TaskList, Task *> createTree(
                 throw std::runtime_error{"could not find name " + name +
                                          " at " + std::string{in->pos}};
             }
-            auto tree = createTree(file, *f, duplicateMap);
+            auto tree = createTree(file, *f, duplicateMap, style);
             task.pushIn(tree.second);
             taskList.insert(std::move(tree.first));
         }
@@ -225,9 +233,6 @@ std::pair<TaskList, Task *> createTree(
     if (auto p = root.property("config")) {
         task.config(p->values);
     }
-    if (auto p = root.property("flagstyle")) {
-        task.flagStyle(p->value());
-    }
     {
         auto &commands = root.ocommands();
 
@@ -252,7 +257,9 @@ TaskList createTasks(const MatmakeFile &file, std::string rootName) {
                     // multiple versions of the same file
                     auto duplicateMap = std::map<filesystem::path, Task *>{};
                     auto tasks =
-                        task::createTree(file, node, duplicateMap).first;
+                        task::createTree(
+                            file, node, duplicateMap, FlagStyle::Inherit)
+                            .first;
                     prescan(tasks);
                     calculateState(tasks);
                     return tasks;

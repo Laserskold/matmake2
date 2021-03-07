@@ -108,9 +108,21 @@ For more information about c++20 modules (in clang)
 https://clang.llvm.org/docs/Modules.html
 
 
-## Todo
-- [ ] Automatically parse visual studio debug console environment variables before build
-- [ ] Include matmakefiles from other directories
-- [ ] Trace command line arguments
-- [ ] Shared libraries
-- [/] Static libraries
+
+Cross compile for windows on linux using msvc
+---------------------------------------------
+
+(Requires access to a windows machine)
+
+### Install msvc on your linux machine
+ 1. Download and install Microsoft Visual Studio on a windows machine
+ 2. Install wine on your linux machine
+ 2. Copy "Microsoft Visual Studio/2019" and "Windows Kits" from the windows
+       machine to corresponding location on the wine drive
+       (~./drive_c/Program Files (x86))
+       
+ 3. Run matmake2 with "--target wine-msvc" to compile
+
+You might have to install the vcruntime.dll to your wine drive as well or put it
+ in your build folder, otherwise the program will show errors on startup.
+ 
