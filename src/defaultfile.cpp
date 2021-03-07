@@ -47,8 +47,26 @@ const char *defaultCompilerSource = R"_(
     "flagstyle": "msvc",
     "in": [ "@all" ],
     "cxx": "wine cl.exe",
-    "ar": "cl.exe",
+    "ar": "wine cl.exe",
     "dir": "build/wine-msvc",
+    "command": "[root]",
+    "includeprefix": "/I",
+    "flags": [ "/EHsc" ],
+    "commands": {
+      "cxx": "{c++} /TP {src} {modules} /Fo:{out} /c {cxxflags} {flags} {includes}",
+      "exe": "{c++} {in}  {ldflags} {flags} {includes} /link /out:{out}",
+      "eem": "{c++} /TP {in} {standard} {includes} {eflags} /E > {out}",
+      "cxxm": "{c++} /TP {cxxflags} {flags} {includes} -c {in} -o {out} ",
+      "static": "{ar} /OUT:{out} {in}"
+    }
+  },
+  {
+    "name": "msvc",
+    "flagstyle": "msvc",
+    "in": [ "@all" ],
+    "cxx": "cl.exe",
+    "ar": "cl.exe",
+    "dir": "build/msvc",
     "command": "[root]",
     "includeprefix": "/I",
     "flags": [ "/EHsc" ],
