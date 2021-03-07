@@ -65,8 +65,8 @@ Settings::Settings(int argc, char **argv) {
         else if (arg == "--target" || arg == "-t") {
             ++i;
             target = args.at(i);
-            if (target == "wine-msvc") {
-                useMsvcWine = true;
+            if (target == "wine-msvc" || target == "msvc") {
+                useMsvcEnvironment = true;
             }
         }
         else if (arg == "--clean") {
@@ -86,7 +86,7 @@ Settings::Settings(int argc, char **argv) {
             outputCompileCommands = true;
         }
         else if (arg == "--msvc-wine") {
-            useMsvcWine = true;
+            useMsvcEnvironment = true;
         }
     }
 }

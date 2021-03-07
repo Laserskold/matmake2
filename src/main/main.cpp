@@ -233,24 +233,30 @@ int clean(const Settings settings) {
 int main(int argc, char **argv) {
     const auto settings = Settings{argc, argv};
 
-    if (settings.useMsvcWine) {
-        setMsvcEnvironment();
-    }
+    try {
 
-    switch (settings.command) {
-    case Command::ParseTasks:
-        return parseTasksCommand(settings);
-        break;
-    case Command::Build:
-    case Command::BuildAndTest: {
-        return build(settings);
-    } break;
-    case Command::List: {
-        return list(settings);
-    } break;
-    case Command::Clean: {
-        return clean(settings);
-    } break;
+        if (settings.useMsvcEnvironment) {
+            setMsvcEnvironment();
+        }
+
+        switch (settings.command) {
+        case Command::ParseTasks:
+            return parseTasksCommand(settings);
+            break;
+        case Command::Build:
+        case Command::BuildAndTest: {
+            return build(settings);
+        } break;
+        case Command::List: {
+            return list(settings);
+        } break;
+        case Command::Clean: {
+            return clean(settings);
+        } break;
+        }
+    }
+    catch (std::runtime_error &e) {
+        std::cerr << "error: " << e.what() << "\n";
     }
 
     return 0;

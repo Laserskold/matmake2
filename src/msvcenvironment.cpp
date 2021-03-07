@@ -9,6 +9,7 @@
 #ifdef MATMAKE_USING_WINDOWS
 
 int setenv(const char *name, const char *value, int overwrite) {
+    //    auto s = std::string{name} + "=" + value;
     return _putenv_s(name, value);
 }
 
@@ -42,9 +43,15 @@ std::string concatPaths(std::vector<filesystem::path> paths) {
 } // namespace
 
 void setMsvcEnvironment() {
-    auto home = filesystem::path{getenv("HOME")};
-
-    filesystem::path driveC = home / ".wine" / "drive_c";
+    filesystem::path driveC = [] {
+        if (getOs() == Os::Windows) {
+            return filesystem::path{"C:"};
+        }
+        else {
+            auto home = filesystem::path{getenv("HOME")};
+            return filesystem::path{home / ".wine" / "drive_c"};
+        }
+    }();
 
     auto programFiles = [driveC] {
         for (auto &it : filesystem::directory_iterator{driveC}) {
@@ -74,7 +81,6 @@ void setMsvcEnvironment() {
         auto regular = "C:\\windows;C:\\windows\\system32";
 
         for (auto &path : paths) {
-            std::cout << "path: " << path << std::endl;
             if (!filesystem::exists(path)) {
                 std::cerr << "cannot find path " << path << "\n";
             }
