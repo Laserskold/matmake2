@@ -65,7 +65,7 @@ public:
         }
         else {
             auto path = dir() / _out;
-            auto ext = extensionFromCommandType(_command, _flagStyle);
+            auto ext = extensionFromCommandType(_command, flagStyle());
             if (!ext.empty()) {
                 path.replace_extension(ext);
             }
@@ -183,7 +183,7 @@ public:
             }
         }
         else if (name.front() == '.') {
-            return ::extension(name, _flagStyle);
+            return ::extension(name, flagStyle());
         }
         else if (name == "command") {
             return _command;
@@ -250,7 +250,7 @@ public:
     std::string concatIncludes() const {
         std::ostringstream ss;
 
-        auto includePrefix = ::includePrefix(_flagStyle);
+        auto includePrefix = ::includePrefix(flagStyle());
 
         for (auto &i : _includes) {
             ss << includePrefix << i << " ";
@@ -337,7 +337,7 @@ public:
     std::string extension() const {
         auto command = this->command();
         if (!command.empty()) {
-            extensionFromCommandType(command, _flagStyle);
+            extensionFromCommandType(command, flagStyle());
         }
         return {};
     }
@@ -434,7 +434,9 @@ public:
 
         for (auto &in : in()) {
             if (in->isModule()) {
-                ss << "-fmodule-file=" << in->out() << " ";
+                ss << translateString(TranslatableString::IncludeModuleString,
+                                      flagStyle())
+                   << in->out() << " ";
             }
         }
 
@@ -497,8 +499,10 @@ public:
             ss << _parent->config();
         }
 
+        auto flagStyle = this->flagStyle();
+
         for (auto &c : _config) {
-            ss << translateConfig(c, _flagStyle) << " ";
+            ss << translateConfig(c, flagStyle) << " ";
         }
 
         auto str = ss.str();

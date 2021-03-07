@@ -4,6 +4,7 @@
 #include "createtasks.h"
 #include "filesystem.h"
 #include "matmakefile.h"
+#include "msvcenvironment.h"
 #include "parsematmakefile.h"
 #include "settings.h"
 #include "tasklist.h"
@@ -231,6 +232,10 @@ int clean(const Settings settings) {
 
 int main(int argc, char **argv) {
     const auto settings = Settings{argc, argv};
+
+    if (settings.useMsvcWine) {
+        setMsvcEnvironment();
+    }
 
     switch (settings.command) {
     case Command::ParseTasks:

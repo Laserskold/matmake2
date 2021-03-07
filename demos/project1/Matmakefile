@@ -1,0 +1,10 @@
+
+main
+  src = src/*.cpp
+  config =
+    debug
+    c++17
+  command = [exe]
+
+all
+  in = @main

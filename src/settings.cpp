@@ -15,7 +15,8 @@ options:
 --clean               remove all built file
 --list                list available targets
 --test                run all targets marked with [test]
---compile-commands   output clang compile commands.json
+--compile-commands    output clang compile commands.json
+--msvc-wine           setup msvc paths in wine to run in linux
 
 developer options:
 --tasks [taskfile]    build a task json-file
@@ -64,6 +65,9 @@ Settings::Settings(int argc, char **argv) {
         else if (arg == "--target" || arg == "-t") {
             ++i;
             target = args.at(i);
+            if (target == "wine-msvc") {
+                useMsvcWine = true;
+            }
         }
         else if (arg == "--clean") {
             command = Command::Clean;
@@ -80,6 +84,9 @@ Settings::Settings(int argc, char **argv) {
         }
         else if (arg == "--compile-commands") {
             outputCompileCommands = true;
+        }
+        else if (arg == "--msvc-wine") {
+            useMsvcWine = true;
         }
     }
 }

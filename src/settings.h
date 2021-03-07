@@ -19,6 +19,7 @@ struct Settings {
     bool debugPrint = false;
     bool skipBuild = false;
     bool outputCompileCommands = false;
+    bool useMsvcWine = false;
     std::string target = "";
 
     Command command = Command::Build;
