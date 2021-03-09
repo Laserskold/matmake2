@@ -62,6 +62,10 @@ TaskList createTaskFromPath(filesystem::path path,
 
     auto type = SourceType{};
 
+    if (path.empty()) {
+        return {};
+    }
+
     try {
         type = sourceTypeMap.at(path.extension());
     }

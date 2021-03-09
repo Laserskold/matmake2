@@ -604,8 +604,14 @@ public:
 
         if (_in.empty()) {
             if (!exists()) {
-                throw std::runtime_error{"input file " + out().string() +
-                                         " not found"};
+                if (_out.empty()) {
+                    throw std::runtime_error{"target " + name() +
+                                             " does specify 'out'"};
+                }
+                else {
+                    throw std::runtime_error{"input file " + out().string() +
+                                             " not found"};
+                }
             }
             _state = TaskState::Raw;
             for (auto &t : _triggers) {
