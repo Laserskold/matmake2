@@ -257,6 +257,7 @@ int main(int argc, char **argv) {
     }
     catch (std::runtime_error &e) {
         std::cerr << "error: " << e.what() << "\n";
+        return 1;
     }
 
     return 0;
