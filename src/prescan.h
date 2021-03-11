@@ -45,8 +45,18 @@ std::optional<PrescanResult> parsePrescanResults(filesystem::path expandedFile,
 
     if (auto f = json.find("include"); f != json.end()) {
         result.includes.reserve(f->size());
+
+        auto expandedTime = filesystem::last_write_time(expandedFile);
+
         for (auto &j : *f) {
-            result.includes.push_back(j.string());
+            auto includeFilename = j.string();
+            auto includeTime = filesystem::last_write_time(includeFilename);
+            if (includeTime > expandedTime) {
+                // One of the included headers is changed, the eem-file needs
+                // to be recreated
+                return {};
+            }
+            result.includes.push_back(includeFilename);
         }
     }
 
@@ -217,9 +227,11 @@ void prescan(TaskList &tasks) {
                 connections.push_back({pcm, "@" + in});
             }
 
-            for (auto &in : prescanResult.includes) {
-                connections.push_back({pcm, in});
-            }
+            // This is not needed because the eem file will be recreated if
+            // any header is changed
+            // for (auto &in : prescanResult.includes) {
+            //    connections.push_back({pcm, in});
+            // }
         }
     }
 
