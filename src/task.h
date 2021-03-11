@@ -621,6 +621,11 @@ public:
         }
 
         for (auto &in : _in) {
+            if (this == in) {
+                throw std::runtime_error{name() +
+                                         " is trying to import itself"};
+            }
+
             in->updateState();
             if (in->state() == TaskState::Raw) {
                 if (in->changedTime() > changedTime()) {
