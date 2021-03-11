@@ -19,7 +19,7 @@ const char *defaultCompilerSource = R"_(
       "gch": "{c++} {in} -o {out} {depfile} {cxxflags} {flags} {includes}",
       "eem": "{c++} {in} {standard} {includes} {eflags} -E > {out}",
       "pcm": "{c++} {cxxflags} {flags} {includes} {modules} --precompile -x c++-module {src} -o {out} ",
-      "cxxm": "{c++} {cxxflags} {flags} {includes} -c {in} -o {out} ",
+      "cxxm": "{c++} -c {in} -o {out} ",
       "static": "{ar} -rs {out} {in}"
     }
   },
@@ -38,7 +38,7 @@ const char *defaultCompilerSource = R"_(
       "gch": "{c++} {in} -o {out} {depfile} {cxxflags} {flags} {includes}",
       "eem": "{c++} {in} {standard} {includes} {eflags} -E > {out}",
       "pcm": "{c++} {cxxflags} {flags} {includes} {modules} --precompile -x c++-module {src} -o {out} ",
-      "cxxm": "{c++} {cxxflags} {flags} {includes} -c {in} -o {out} ",
+      "cxxm": "{c++} -c {in} -o {out} ",
       "static": "{ar} -rs {out} {in}"
     }
   },
