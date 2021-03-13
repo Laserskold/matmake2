@@ -499,7 +499,10 @@ public:
     std::string config() const {
         std::ostringstream ss;
         if (_parent) {
-            ss << _parent->config();
+            auto parentConfig = _parent->config();
+            if (!parentConfig.empty()) {
+                ss << parentConfig << " ";
+            }
         }
 
         auto flagStyle = this->flagStyle();
