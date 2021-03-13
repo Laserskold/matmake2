@@ -21,5 +21,7 @@ jobs:
       run: ./build-linux.sh clang++-11
       shell: bash
     - name: self build
-      run: build/matmake2 -t clang++-11
+      run: build/matmake2 -t clang
+    - name: test
+      run: build/matmake2 -t clang
 

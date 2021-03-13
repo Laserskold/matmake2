@@ -46,8 +46,9 @@ TEST_CASE("0 - right status") {
     EXPECT_FALSE(main->exists());
 
     auto settings = Settings{};
+    settings.numThreads = 1;
     auto coordinator = Coordinator{};
-    coordinator.execute(tasks, settings);
+    EXPECT_FALSE(coordinator.execute(tasks, settings));
 
     EXPECT_TRUE(main->exists());
 }
@@ -62,9 +63,10 @@ TEST_CASE("1 - touch file -> rebuild") {
 
         ASSERT_EQ(tasks.empty(), false);
 
-        auto settings = Settings();
+        auto settings = Settings{};
+        settings.numThreads = 1;
         auto coordinator = Coordinator{};
-        coordinator.execute(tasks, settings);
+        EXPECT_FALSE(coordinator.execute(tasks, settings));
 
         auto main = tasks.find("@main");
         time1 = filesystem::last_write_time(main->out());
@@ -82,8 +84,10 @@ TEST_CASE("1 - touch file -> rebuild") {
         ASSERT_EQ(tasks.empty(), false);
 
         auto settings = Settings();
+        settings.numThreads = 1;
+
         auto coordinator = Coordinator{};
-        coordinator.execute(tasks, settings);
+        EXPECT_FALSE(coordinator.execute(tasks, settings));
 
         auto main = tasks.find("@main");
 
