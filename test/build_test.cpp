@@ -37,19 +37,19 @@ TEST_CASE("0 - right status") {
 
     auto root = tasks.find("@clang");
 
-    ASSERT_NE(root, nullptr);
+    EXPECT_TRUE(root);
 
     auto main = tasks.find("@main");
 
-    ASSERT_NE(main, nullptr);
+    EXPECT_TRUE(main);
 
-    ASSERT_EQ(main->exists(), false);
+    EXPECT_FALSE(main->exists());
 
     auto settings = Settings{};
     auto coordinator = Coordinator{};
     coordinator.execute(tasks, settings);
 
-    ASSERT_EQ(main->exists(), true);
+    EXPECT_TRUE(main->exists());
 }
 
 TEST_CASE("1 - touch file -> rebuild") {
@@ -71,7 +71,7 @@ TEST_CASE("1 - touch file -> rebuild") {
 
         auto other = tasks.find("./src/other.cppm");
 
-        ASSERT_NE(other, nullptr);
+        EXPECT_TRUE(other);
         std::ofstream{other->out(), std::ios::app} << " "; // Touch file
     }
 
