@@ -1,4 +1,4 @@
-name: Ubuntu self build (clang)
+name: Ubuntu self build (gcc)
 
 on:
   push:
@@ -15,11 +15,9 @@ jobs:
     - uses: actions/checkout@v2
     - name: git submodules
       run: git submodule update --init
-    - name: install stuff
-      run: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh &&  sudo ./llvm.sh 11
     - name: build
-      run: ./build-linux.sh clang++-11
+      run: ./build-linux.sh
       shell: bash
     - name: self build
-      run: build/matmake2 -t clang++-11
+      run: build/matmake2 -t gcc
 
