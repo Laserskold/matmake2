@@ -5,7 +5,7 @@
     "pch" : [ "include/precompiled.hpp" ],
     "src": [ "src/*.cpp", "src/*.cppm" ],
     "copy": [
-      "data/*"
+      "data/"
     ],
     "includes": [
       "include"

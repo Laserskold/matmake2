@@ -139,6 +139,44 @@ inline TaskList createTaskFromPath(filesystem::path path,
     return ret;
 }
 
+//! Create a task to copy a single file
+inline TaskList createCopyTaskFromPath(std::string pattern) {
+    TaskList ret;
+
+    auto createCopyTask = [&ret](std::filesystem::path path) {
+        auto &source = ret.emplace();
+
+        source.out("." / path);
+        source.command("[none]");
+
+        auto &task = ret.emplace();
+        task.pushIn(&source);
+        task.out(path);
+
+        task.command("[copy]");
+    };
+
+    if (filesystem::exists(pattern)) {
+        if (filesystem::is_directory(pattern)) {
+            for (auto &it : filesystem::recursive_directory_iterator{pattern}) {
+                if (!filesystem::is_directory(it.path())) {
+                    createCopyTask(it.path());
+                }
+            }
+        }
+        else {
+            createCopyTask(pattern);
+        }
+    }
+    else {
+        for (auto path : expandPaths(pattern)) {
+            createCopyTask(pattern);
+        }
+    }
+
+    return ret;
+}
+
 inline std::pair<TaskList, Task *> createTree(
     const MatmakeFile &file,
     const MatmakeNode &root,
@@ -191,6 +229,17 @@ inline std::pair<TaskList, Task *> createTree(
                     }
                 }
             }
+        }
+    }
+    if (auto p = root.property("copy")) {
+        for (auto &c : p->values) {
+            auto list = createCopyTaskFromPath(c);
+            for (auto &copyTask : list) {
+                if (copyTask->command() == "copy") {
+                    task.pushIn(copyTask.get());
+                }
+            }
+            taskList.insert(std::move(list));
         }
     }
     if (in) {

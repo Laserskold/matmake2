@@ -27,8 +27,6 @@ public:
 
     RunStatus run(std::string command, bool verbose) {
         std::cout << command << std::endl;
-        //        std::cout << ("running " + command + "\n");
-        //        std::cout.flush();
         if (std::system(command.c_str())) {
             return RunStatus::Failed;
         }
@@ -41,8 +39,6 @@ public:
     bool execute(TaskList &tasks, const Settings &settings) {
         using namespace std::chrono_literals;
         _status = CoordinatorStatus::Running;
-
-        auto nThreads = std::thread::hardware_concurrency();
 
         {
             auto lock = std::scoped_lock{_todoMutex};
@@ -61,15 +57,12 @@ public:
         createDirectories(tasks);
 
         if (_todo.empty()) {
-            //            throw std::runtime_error{
-            //                "Nothing to do\n"};
-
             std::cout << "Nothing to do...\n";
             return false;
         }
 
-        workers.reserve(nThreads);
-        for (size_t i = 0; i < nThreads; ++i) {
+        workers.reserve(settings.numThreads);
+        for (size_t i = 0; i < settings.numThreads; ++i) {
             workers.emplace_back([this, i, &settings] {
                 if (settings.debugPrint) {
                     std::cout
@@ -98,6 +91,12 @@ public:
                             else {
                                 pushFinished(task, settings.verbose);
                             }
+                        }
+                        else if (rawCommand.empty() ||
+                                 rawCommand.front() == '[') {
+                            throw std::runtime_error{
+                                "could not find " + rawCommand + " on target " +
+                                task->name()};
                         }
                         else {
                             auto command =

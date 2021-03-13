@@ -28,6 +28,8 @@ struct TaskList {
         for (auto &task : tasks._tasks) {
             _tasks.push_back(std::move(task));
         }
+
+        tasks.clear();
     }
 
     Task *find(std::string name) {
@@ -58,6 +60,10 @@ struct TaskList {
         }
 
         return nullptr;
+    }
+
+    void clear() {
+        _tasks.clear();
     }
 
     Task &at(size_t i) {
