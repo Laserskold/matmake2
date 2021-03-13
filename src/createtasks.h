@@ -10,7 +10,7 @@
 
 namespace task {
 
-std::vector<filesystem::path> expandPaths(filesystem::path expression) {
+inline std::vector<filesystem::path> expandPaths(filesystem::path expression) {
     auto filename = expression.filename().string();
     if (auto f = filename.find('*'); f != std::string::npos) {
         auto dir = expression.parent_path();
@@ -55,9 +55,9 @@ std::vector<filesystem::path> expandPaths(filesystem::path expression) {
 }
 
 //! The last item is the one that is expected to be linked to
-TaskList createTaskFromPath(filesystem::path path,
-                            FlagStyle style,
-                            bool useModules = true) {
+inline TaskList createTaskFromPath(filesystem::path path,
+                                   FlagStyle style,
+                                   bool useModules = true) {
     auto ret = TaskList{};
 
     auto type = SourceType{};
@@ -139,7 +139,7 @@ TaskList createTaskFromPath(filesystem::path path,
     return ret;
 }
 
-std::pair<TaskList, Task *> createTree(
+inline std::pair<TaskList, Task *> createTree(
     const MatmakeFile &file,
     const MatmakeNode &root,
     std::map<filesystem::path, Task *> &duplicateMap,
@@ -252,7 +252,7 @@ std::pair<TaskList, Task *> createTree(
 
 } // namespace task
 
-TaskList createTasks(const MatmakeFile &file, std::string rootName) {
+inline TaskList createTasks(const MatmakeFile &file, std::string rootName) {
     for (auto &node : file.nodes()) {
         if (auto command = node.property("command")) {
             if (command->value() == "[root]") {
