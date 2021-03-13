@@ -1,5 +1,6 @@
 #include "settings.h"
 #include <iostream>
+#include <thread>
 
 namespace {
 
@@ -11,6 +12,7 @@ options:
 --help -h             print this text
 --verbose -v          print extra information
 -C [dir]              run in another directory
+-j                    set number of worker threads
 --target -t [target]  select target (eg g++, clang++, msvc)
 --clean               remove all built file
 --list                list available targets
@@ -59,6 +61,10 @@ Settings::Settings(int argc, char **argv) {
             ++i;
             filesystem::current_path(args.at(i));
         }
+        else if (arg == "-j") {
+            ++i;
+            numThreads = std::stol(args.at(i));
+        }
         else if (arg == "--dry-run") {
             skipBuild = true;
         }
@@ -88,5 +94,9 @@ Settings::Settings(int argc, char **argv) {
         else if (arg == "--msvc-wine") {
             useMsvcEnvironment = true;
         }
+    }
+
+    if (numThreads == 0) {
+        numThreads = std::thread::hardware_concurrency();
     }
 }

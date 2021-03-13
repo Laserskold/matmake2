@@ -95,6 +95,8 @@ int execute(std::string filename, filesystem::path path) {
 int test(const TaskList &tasks, const Settings &settings) {
     std::vector<const Task *> tests;
 
+    bool error = false;
+
     for (auto &task : tasks) {
         if (task->isTest()) {
             auto exe = task->out();
@@ -102,6 +104,7 @@ int test(const TaskList &tasks, const Settings &settings) {
             auto command = exe.filename();
             if (execute(command.string(), path)) {
                 std::cout << "failed...";
+                error = true;
             }
             else {
                 std::cout << "succsess...";
@@ -109,7 +112,7 @@ int test(const TaskList &tasks, const Settings &settings) {
         }
     }
 
-    return 0;
+    return error;
 }
 
 void outputCompileCommands(const TaskList &tasks) {

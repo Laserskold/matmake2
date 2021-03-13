@@ -21,6 +21,7 @@ struct Settings {
     bool outputCompileCommands = false;
     bool useMsvcEnvironment = false;
     std::string target = "";
+    size_t numThreads = 0;
 
     Command command = Command::Build;
 

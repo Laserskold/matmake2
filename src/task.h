@@ -122,7 +122,10 @@ public:
         for (auto &in : _in) {
             auto fname = in->out();
             auto ext = fname.extension();
-            if (ext == ".gch" || ext == ".pch" || ext == "") {
+            if (!in->shouldLinkFile()) {
+                continue;
+            }
+            else if (ext == ".gch" || ext == ".pch" || ext == "") {
                 fname.replace_extension("");
                 ret += " -include " + fname.string() + " ";
             }
@@ -283,6 +286,7 @@ public:
     }
 
     void command(std::string command) {
+        shouldLinkFile(command != "[copy]");
         _command = command;
     }
 
@@ -328,10 +332,7 @@ public:
         else if (_parent) {
             return _parent->commandAt(name);
         }
-        else {
-            throw std::runtime_error{"could not find " + name + " on target " +
-                                     this->name()};
-        }
+        return name;
     }
 
     std::string extension() const {
@@ -685,6 +686,15 @@ public:
         return removed;
     }
 
+    //! IF the file should be used in its parent task at input
+    void shouldLinkFile(bool value) {
+        _shouldLinkFile = value;
+    }
+
+    bool shouldLinkFile() {
+        return _shouldLinkFile;
+    }
+
     Json dump();
 
     //! Print tree view from node
@@ -717,5 +727,6 @@ private:
     std::vector<Task *> _subscribers;
     TimePoint _changedTime;
     bool _isChangedTimeCurrent = false;
+    bool _shouldLinkFile = true;
     TaskState _state = TaskState::NotCalculated;
 };
