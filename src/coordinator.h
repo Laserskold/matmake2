@@ -29,7 +29,8 @@ public:
     };
 
     RunStatus run(std::string command, bool verbose) {
-        std::cout << command << std::endl;
+        std::cout << command << "\n";
+        std::cout.flush();
         if (std::system(command.c_str())) {
             return RunStatus::Failed;
         }
@@ -188,7 +189,8 @@ public:
         auto lock = std::scoped_lock{_subscriberMutex};
 
         if (verbose) {
-            std::cout << "task " + task->name() + " finished" << std::endl;
+            std::cout << "task " + task->name() + " finished";
+            std::cout.flush();
         }
         _finished.push_back(task);
     }

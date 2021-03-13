@@ -1,5 +1,6 @@
 #include "settings.h"
 #include <iostream>
+#include <sstream>
 #include <thread>
 
 namespace {
@@ -28,6 +29,14 @@ developer options:
 --debug -d            print debugging information
 
 )_";
+
+// Because stoi and stol does not seem to work on msvc
+long toI(std::string str) {
+    std::istringstream ss(str);
+    long l;
+    ss >> l;
+    return l;
+}
 
 } // namespace
 
@@ -67,7 +76,7 @@ Settings::Settings(int argc, char **argv) {
         }
         else if (arg == "-j") {
             ++i;
-            numThreads = std::stol(args.at(i));
+            numThreads = toI(args.at(i));
         }
         else if (arg == "--dry-run") {
             skipBuild = true;
@@ -75,7 +84,7 @@ Settings::Settings(int argc, char **argv) {
         else if (arg == "--target" || arg == "-t") {
             ++i;
             target = args.at(i);
-            if (target == "wine-msvc" || target == "msvc") {
+            if (target.find("msvc") != std::string::npos) {
                 useMsvcEnvironment = true;
             }
         }
