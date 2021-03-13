@@ -2,6 +2,7 @@
 
 #include "filesystem.h"
 #include "nativecommands.h"
+#include "processedcommand.h"
 #include "settings.h"
 #include "tasklist.h"
 #include <iostream>

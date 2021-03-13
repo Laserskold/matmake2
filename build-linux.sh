@@ -2,5 +2,9 @@ mkdir -p build
 
 CXX=$1
 
-${CXX} -o build/matmake2 src/*.cpp src/main/main.cpp \
+echo building with ${CXX}...
+
+${CXX} -o build/matmake2 matmake.cpp \
         -Isrc -Ilib/json.h/include -std=c++17 -pthread -g
+
+echo done...
