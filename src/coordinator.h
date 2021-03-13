@@ -11,6 +11,9 @@
 #include <string>
 #include <thread>
 
+//! Coordinates the build. The main thread handleds dependencies and triggers
+//! worker threads. Worker threads only handles their specific tasks, and when
+//! they are done they signal back to the main thread for more work.
 class Coordinator {
 public:
     enum class RunStatus {
@@ -61,64 +64,14 @@ public:
             return false;
         }
 
+        if (settings.numThreads == 0) {
+            throw std::runtime_error{"numThreads == 0"};
+        }
+
         workers.reserve(settings.numThreads);
         for (size_t i = 0; i < settings.numThreads; ++i) {
-            workers.emplace_back([this, i, &settings] {
-                if (settings.debugPrint) {
-                    std::cout
-                        << ("starting thread " + std::to_string(i) + "\n");
-                }
-                while (_status == CoordinatorStatus::Running) {
-                    if (auto task = popTask()) {
-                        auto out = task->out();
-                        if (out.empty()) {
-                            if (settings.debugPrint) {
-                                std::cout << " do not build task "
-                                          << task->name()
-                                          << " because no output files is "
-                                             "specified\n";
-                            }
-                            pushFinished(task, settings.verbose);
-                            continue;
-                        }
-
-                        auto rawCommand = task->command();
-
-                        if (auto f = native::findCommand(rawCommand)) {
-                            if (f(*task) == native::CommandStatus::Failed) {
-                                _status = CoordinatorStatus::Failed;
-                            }
-                            else {
-                                pushFinished(task, settings.verbose);
-                            }
-                        }
-                        else if (rawCommand.empty() ||
-                                 rawCommand.front() == '[') {
-                            throw std::runtime_error{
-                                "could not find " + rawCommand + " on target " +
-                                task->name()};
-                        }
-                        else {
-                            auto command =
-                                ProcessedCommand{rawCommand}.expand(*task);
-
-                            if (!command.empty()) {
-                                if (run(command, settings.verbose) ==
-                                    RunStatus::Failed) {
-                                    _status = CoordinatorStatus::Failed;
-                                }
-                                else {
-                                    task->setState(TaskState::Done);
-                                    pushFinished(task, settings.verbose);
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        std::this_thread::sleep_for(10ms);
-                    }
-                }
-            });
+            workers.emplace_back(
+                [this, i, &settings] { workerThread(i, settings); });
         }
 
         while (_status == CoordinatorStatus::Running) {
@@ -152,6 +105,66 @@ public:
         return _status != CoordinatorStatus::Done;
     }
 
+    //! Runs in worker thread (obviously)
+    void workerThread(size_t i, const Settings &settings) {
+        using namespace std::chrono_literals;
+
+        if (settings.debugPrint) {
+            std::cout << ("starting thread " + std::to_string(i) + "\n");
+        }
+        while (_status == CoordinatorStatus::Running) {
+            if (auto task = popTask()) {
+                auto out = task->out();
+                if (out.empty()) {
+                    if (settings.debugPrint) {
+                        std::cout << " do not build task " << task->name()
+                                  << " because no output files is "
+                                     "specified\n";
+                    }
+                    pushFinished(task, settings.verbose);
+                    continue;
+                }
+
+                buildTask(task, settings);
+            }
+            else {
+                std::this_thread::sleep_for(10ms);
+            }
+        }
+    }
+
+    //! Runs on worker thread
+    void buildTask(Task *task, const Settings &settings) {
+        auto rawCommand = task->command();
+
+        if (auto f = native::findCommand(rawCommand)) {
+            if (f(*task) == native::CommandStatus::Failed) {
+                _status = CoordinatorStatus::Failed;
+            }
+            else {
+                pushFinished(task, settings.verbose);
+            }
+        }
+        else if (rawCommand.empty() || rawCommand.front() == '[') {
+            throw std::runtime_error{"could not find " + rawCommand +
+                                     " on target " + task->name()};
+        }
+        else {
+            auto command = ProcessedCommand{rawCommand}.expand(*task);
+
+            if (!command.empty()) {
+                if (run(command, settings.verbose) == RunStatus::Failed) {
+                    _status = CoordinatorStatus::Failed;
+                }
+                else {
+                    task->setState(TaskState::Done);
+                    pushFinished(task, settings.verbose);
+                }
+            }
+        }
+    }
+
+    //! Get a new task for the worker
     [[nodiscard]] Task *popTask() {
         auto lock = std::scoped_lock{_todoMutex};
 
@@ -165,6 +178,7 @@ public:
         }
     }
 
+    //! Add a task to the que to be worked on asap
     void pushTask(Task *task) {
         auto lock = std::scoped_lock{_todoMutex};
         _todo.push_back(task);

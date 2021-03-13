@@ -19,7 +19,7 @@ task_test
   command = [test]
 
 parse_matmakefile_test
-  out = task_test
+  out = parse_matmakefile_test
   src =
     src/*.cpp
     test/parse_matmakefile_test.cpp

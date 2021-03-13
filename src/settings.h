@@ -25,7 +25,7 @@ struct Settings {
 
     Command command = Command::Build;
 
-    Settings() = default;
+    Settings();
 
     Settings(int argc, char **argv);
 };
