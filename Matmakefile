@@ -17,6 +17,13 @@ task_test
     test/task_test.cpp
   command = [test]
 
+parse_matmakefile_test
+  out = task_test
+  src =
+    src/*.cpp
+    test/parse_matmakefile_test.cpp
+  command = [test]
+
 build_test
   out = build_test
   src =
@@ -28,6 +35,7 @@ all
   in =
     @matmake2
     @task_test
+    @parse_matmakefile_test
     @build_test
   includes =
     src
