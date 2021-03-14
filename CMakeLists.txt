@@ -29,6 +29,7 @@ add_library(
    "src/parsematmakefile.cpp"
    "src/translateconfig.cpp"
    "src/msvcenvironment.cpp"
+   "src/exampleproject.cpp"
 )
 
 add_subdirectory(lib/json.h)

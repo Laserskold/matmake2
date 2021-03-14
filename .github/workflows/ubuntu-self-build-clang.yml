@@ -24,4 +24,8 @@ jobs:
       run: build/matmake2 -t clang
     - name: test
       run: build/matmake2 -t clang
+    - name: create example project
+      run: build/clang/matmake2 --init test
+    - name: build example project
+      run: build/clang/matmake2 -C test --target gcc
 

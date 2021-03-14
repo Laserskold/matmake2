@@ -35,8 +35,9 @@ struct Property {
             throw std::runtime_error{"could not find value for property"};
         }
         else if (values.size() > 1) {
-            throw std::runtime_error{"Expected single property: " +
-                                     std::string{pos}};
+            throw std::runtime_error{
+                "Expected single property: " + std::string{pos} + " -> " +
+                values.front()};
         }
         return values.front();
     }
