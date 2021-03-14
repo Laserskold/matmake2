@@ -86,6 +86,8 @@ inline TaskList createTaskFromPath(filesystem::path path,
 
         task.command("[cxx]");
 
+        task.buildLocation(BuildLocation::Intermediate);
+
         task.depfile(path.string() + ".d");
     }
     else {
@@ -100,6 +102,8 @@ inline TaskList createTaskFromPath(filesystem::path path,
         expandedSource.out(path.string() + ".eem");
 
         expandedSource.command("[none]");
+
+        expandedSource.buildLocation(BuildLocation::Intermediate);
 
         if (type == SourceType::ModuleSource) {
 
@@ -116,6 +120,8 @@ inline TaskList createTaskFromPath(filesystem::path path,
 
             precompiledModule.command("[pcm]");
 
+            precompiledModule.buildLocation(BuildLocation::Intermediate);
+
             auto &task = ret.emplace();
 
             task.pushIn(&precompiledModule);
@@ -123,6 +129,8 @@ inline TaskList createTaskFromPath(filesystem::path path,
             task.out(precompiledPath.string() + extension(".o", style));
 
             task.command("[cxxm]");
+
+            task.buildLocation(BuildLocation::Intermediate);
         }
         else {
             // No precompilation step is needed for ordinary cpp-files
@@ -133,6 +141,8 @@ inline TaskList createTaskFromPath(filesystem::path path,
             task.out(path.string() + extension(".o", style));
 
             task.command((type == SourceType::CSource) ? "[cc]" : "[cxx]");
+
+            task.buildLocation(BuildLocation::Intermediate);
         }
     }
 
@@ -197,7 +207,10 @@ inline std::pair<TaskList, Task *> createTree(
         style = task.flagStyle();
     }
     if (auto p = root.property("dir")) {
-        task.dir(p->value());
+        task.dir(BuildLocation::Real, p->value());
+    }
+    if (auto p = root.property("objdir")) {
+        task.dir(BuildLocation::Intermediate, p->value());
     }
     if (auto p = root.property("cxx")) {
         task.cxx(p->value());
