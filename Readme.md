@@ -76,6 +76,10 @@ install a relativly new compiler.
 
 make
 
+# optional step to install:
+
+make install
+
 ```
  4. You are done
 
