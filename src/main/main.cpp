@@ -95,24 +95,40 @@ int execute(std::string filename, filesystem::path path) {
 int test(const TaskList &tasks, const Settings &settings) {
     std::vector<const Task *> tests;
 
-    bool error = false;
+    size_t failedTests = 0;
+    size_t numTests = 0;
+
+    std::vector<std::string> results;
 
     for (auto &task : tasks) {
         if (task->isTest()) {
+            ++numTests;
             auto exe = task->out();
             auto path = exe.parent_path();
             auto command = exe.filename();
             if (execute(command.string(), path)) {
-                std::cout << "failed...";
-                error = true;
+                ++failedTests;
+
+                results.push_back("failed            " + command.string());
             }
             else {
-                std::cout << "succsess...";
+                results.push_back("success           " + command.string());
             }
         }
     }
 
-    return error;
+    std::cout << "\n\n==== Test summary: ========================== \n";
+
+    for (auto &result : results) {
+        std::cout << result << "\n";
+    }
+
+    std::cout << "\n";
+
+    std::cout << failedTests << " failed of " << numTests << " tests "
+              << std::endl;
+
+    return failedTests > 0;
 }
 
 void outputCompileCommands(const TaskList &tasks) {
@@ -237,7 +253,6 @@ int main(int argc, char **argv) {
     const auto settings = Settings{argc, argv};
 
     try {
-
         if (settings.useMsvcEnvironment) {
             setMsvcEnvironment();
         }
