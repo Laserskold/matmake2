@@ -41,7 +41,10 @@ void Task::parse(const Json &jtask) {
         }
     }
     if (auto f = jsonFind("dir")) {
-        dir(f->string());
+        dir(BuildLocation::Real, f->string());
+    }
+    if (auto f = jsonFind("objdir")) {
+        dir(BuildLocation::Intermediate, f->string());
     }
     if (auto f = jsonFind("depfile")) {
         depfile(f->string());
@@ -83,7 +86,8 @@ Json Task::dump() {
 
     attachValue("name", _name);
     attachValue("out", _out.string());
-    attachValue("dir", _dir.string());
+    attachValue("dir", _dir.front().string());
+    attachValue("objdir", _dir.back().string());
     attachValue("depfile", _depfile.string());
     attachValue("command", _command);
     attachValue("cxx", _cxx.string());

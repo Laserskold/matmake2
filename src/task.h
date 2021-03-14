@@ -5,6 +5,7 @@
 #include "sourcetype.h"
 #include "translateconfig.h"
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <map>
 #include <sstream>
@@ -29,6 +30,14 @@ inline std::string join(std::string a, std::string b) {
     }
     return a + " " + b;
 }
+
+enum class BuildLocation : size_t {
+    Real,         // Build results that should be part of the final product
+    Intermediate, // Object files and others not part of final product
+    Count,        // Put last, counts possibilities
+
+    Inherit, // Select depending on target
+};
 
 class Task {
 public:
@@ -165,17 +174,48 @@ public:
         }
     }
 
-    void dir(filesystem::path dir) {
-        _dir = dir;
+    void dir(BuildLocation loc, filesystem::path dir) {
+        _dir.at(static_cast<size_t>(loc)) = dir;
     }
 
-    filesystem::path dir() const {
+    //! Returns the output path
+    //! If buildLocation() is set to use intermediate location that is
+    //! chosen when traversing the tree
+    //! External users should not specify the variable loc
+    filesystem::path dir(BuildLocation loc = BuildLocation::Inherit) const {
+        if (loc == BuildLocation::Inherit) {
+            loc = _buildLocation;
+        }
+
+        auto dir = [this, loc] {
+            if (loc == BuildLocation::Real) {
+                return _dir.front();
+            }
+
+            auto &dir =
+                _dir.at(static_cast<size_t>(BuildLocation::Intermediate));
+
+            // If no intermediate location exist, just use the real instead
+            if (dir.empty()) {
+                return _dir.front();
+            }
+
+            return dir;
+        }();
+
         if (_parent) {
-            return _parent->dir() / _dir;
+            if (dir.empty()) {
+                return _parent->dir(loc);
+            }
+            return _parent->dir(loc) / dir;
         }
         else {
-            return _dir;
+            return dir;
         }
+    }
+
+    void buildLocation(BuildLocation value) {
+        _buildLocation = value;
     }
 
     std::string property(std::string name) const {
@@ -708,7 +748,8 @@ public:
 private:
     Task *_parent = nullptr;
     filesystem::path _out;
-    filesystem::path _dir;
+    std::array<filesystem::path, static_cast<size_t>(BuildLocation::Count)>
+        _dir;
     filesystem::path _depfile;
     filesystem::path _cxx;
     filesystem::path _cc;
@@ -723,6 +764,7 @@ private:
     std::vector<std::string> _includes;
     std::vector<std::string> _config;
     FlagStyle _flagStyle = FlagStyle::Inherit;
+    BuildLocation _buildLocation = BuildLocation::Real;
 
     // Fixed during connection step
     std::vector<Task *> _in; // Files that needs to be built before this file

@@ -9,6 +9,7 @@ const char *gccSource = R"_(
     "cxx": "g++",
     "ar": "ar",
     "dir": "build/gcc",
+    "objdir": "build/.matmake/obj/gcc",
     "command": "[root]",
     "includeprefix": "-I",
     "commands": {
@@ -33,6 +34,7 @@ const char *msvcSource = R"_(
     "cxx": "cl.exe",
     "ar": "cl.exe",
     "dir": "build/msvc",
+    "objdir": "build/.matmake/obj/msvc",
     "command": "[root]",
     "includeprefix": "/I",
     "flags": [ "/EHsc" ],
@@ -58,6 +60,7 @@ Json defaultCompiler() {
         debugConfig.push_back({"debug"});
         debugConfig.type = Json::Array;
         json["dir"].value += "-debug";
+        json["objdir"].value += "-debug";
         json["name"].value += "-debug";
 
         return json;
@@ -67,6 +70,7 @@ Json defaultCompiler() {
     auto createClangVersion = [](Json json) {
         json["name"] = "clang";
         json["dir"] = "build/clang";
+        json["objdir"] = "build/.matmake/obj/clang";
         json["cxx"] = "clang++-11";
         return json;
     };
@@ -90,6 +94,7 @@ Json defaultCompiler() {
     auto createWineVersion = [](Json json) {
         json["name"].value = "wine-msvc";
         json["dir"].value = "build/wine-msvc";
+        json["objdir"] = "build/.matmake/obj/wine-msvc";
         json["cxx"].value = "wine cl.exe";
         json["ar"].value = "wine cl.exe";
 
