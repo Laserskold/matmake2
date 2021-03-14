@@ -65,6 +65,22 @@ Building on Linux
 This is the easiest way to build matmake on, and does only require you to
 install a relativly new compiler.
 
+#### The simple way
+
+ 1. Install a descent version of g++ or clang++
+ 2. move to the matmake2 folder
+ 3. run
+
+
+```bash
+
+make
+
+```
+ 4. You are done
+
+#### Compile with a specific compiler
+
 ```bash
 ./build-linux.sh clang++-10
 ```
