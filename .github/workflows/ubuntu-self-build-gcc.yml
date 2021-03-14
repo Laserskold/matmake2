@@ -24,4 +24,8 @@ jobs:
       run: build/gcc/task_test
     - name: parse test
       run: build/gcc/parse_matmakefile_test
+    - name: create example project
+      run: build/gcc/matmake2 --init test
+    - name: build example project
+      run: build/gcc/matmake2 -C test --target gcc
 

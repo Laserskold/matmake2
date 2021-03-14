@@ -122,6 +122,24 @@ build-win-clang.bat
 ```
 
 
+Build your first project
+------------------------
+
+Navigate to where you want to create the project in terminal or cmd.
+
+run
+
+```bash
+
+matmake2 --init project-name
+
+matmake -C project-name --target gcc
+
+```
+
+Where `project-name` is the name of your project. And `gcc` could be replaced
+with `clang`, `msvc` or `wine-msvc` depending on what compiler you want to use
+
 For more information about c++20 modules (in clang)
 ---------------------------------------------------
 

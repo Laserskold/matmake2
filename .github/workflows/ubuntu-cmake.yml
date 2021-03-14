@@ -33,4 +33,9 @@ jobs:
     - name: test
       run: ctest --verbose
       working-directory: build
-      
+
+    - name: create example project
+      run: build/matmake2 --init test
+    - name: build example project
+      run: build/matmake2 -C test --target gcc
+

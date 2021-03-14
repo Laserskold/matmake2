@@ -1,11 +1,12 @@
 #include "settings.h"
+#include "exampleproject.h"
 #include <iostream>
 #include <sstream>
 #include <thread>
 
 namespace {
 
-const std::string helpText = R"_(
+const char *helpText = R"_(
 usage:
 matmake2 [options]
 
@@ -106,6 +107,18 @@ Settings::Settings(int argc, char **argv) {
         }
         else if (arg == "--msvc-wine") {
             useMsvcEnvironment = true;
+        }
+        else if (arg == "--init") {
+            ++i;
+            if (i >= args.size()) {
+                std::cerr << "no path specified, use '.' for current directory"
+                          << std::endl;
+                std::exit(0);
+            }
+
+            createExampleProject(args.at(i));
+
+            std::exit(0);
         }
     }
 

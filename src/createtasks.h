@@ -268,8 +268,8 @@ inline std::pair<TaskList, Task *> createTree(
             }
             auto f = file.find(name);
             if (!f) {
-                throw std::runtime_error{"could not find name " + name +
-                                         " at " + std::string{in->pos}};
+                throw std::runtime_error{"could not find name '" + name +
+                                         "' at " + std::string{in->pos}};
             }
             auto tree = createTree(file, *f, duplicateMap, style);
             task.pushIn(tree.second);
