@@ -16,7 +16,7 @@ jobs:
     - name: git submodules
       run: git submodule update --init
     - name: build
-      run: ./build-linux.sh
+      run: make
       shell: bash
     - name: self build
       run: build/matmake2 -t gcc

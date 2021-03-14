@@ -1,3 +1,5 @@
+#!/bin/bash
+
 mkdir -p build
 
 CXX=$1
