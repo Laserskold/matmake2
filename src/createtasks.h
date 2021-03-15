@@ -153,7 +153,7 @@ inline TaskList createTaskFromPath(filesystem::path path,
 inline TaskList createCopyTaskFromPath(std::string pattern) {
     TaskList ret;
 
-    auto createCopyTask = [&ret](std::filesystem::path path) {
+    auto createCopyTask = [&ret](filesystem::path path) {
         auto &source = ret.emplace();
 
         source.out("." / path);

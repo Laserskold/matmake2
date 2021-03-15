@@ -1,4 +1,6 @@
 #include "defaultfile.h"
+#include "os.h"
+#include <cstdlib>
 
 namespace {
 
@@ -48,11 +50,50 @@ const char *msvcSource = R"_(
   }
 )_";
 
+bool hasCommand(std::string command) {
+    if constexpr (getOs() == Os::Linux) {
+        return !system(("command -v " + command + " > /dev/null").c_str());
+    }
+    else {
+        throw std::runtime_error{std::string{__FILE__} + ":" +
+                                 std::to_string(__LINE__) +
+                                 " is not implemented "};
+    }
+} // namespace
+
+std::string getHighestClang() {
+   if (getOs() == Os::Windows) {
+      return "clang++.exe";
+   }
+
+   for (size_t i = 20; i > 2; --i) {
+      auto command = "clang++-" + std::to_string(i);
+      if (hasCommand(command)) {
+         return command;
+      }
+   }
+
+   return "clang++";
+}
+
+std::string getHighestGcc() {
+   if (getOs() == Os::Windows) {
+      return "g++.exe";
+   }
+
+   for (size_t i = 20; i > 2; --i) {
+      auto command = "g++-" + std::to_string(i);
+      if (hasCommand(command)) {
+         return command;
+      }
+   }
+
+   return "g++";
+}
+
 } // namespace
 
 Json defaultCompiler() {
-    //    auto json = Json::Parse(defaultCompilerSource);
-
     auto ret = Json{Json::Array};
 
     auto createDebugVersion = [](Json json) {
@@ -71,13 +112,14 @@ Json defaultCompiler() {
         json["name"] = "clang";
         json["dir"] = "build/clang";
         json["objdir"] = "build/.matmake/obj/clang";
-        json["cxx"] = "clang++-11";
+        json["cxx"] = getHighestClang();
         return json;
     };
 
     // -- gcc --
 
     auto gcc = Json::Parse(gccSource);
+    gcc["cxx"].value = getHighestGcc();
 
     ret.reserve(8);
 
