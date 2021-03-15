@@ -27,7 +27,7 @@ namespace filesystem = std::experimental::filesystem;
 
 //! Compatabilityt function, that only removes the first part of a path,
 //! It is enough for the usecases of this project though
-inline filesystem::path relative(filesystem::path path, filesystem::path base) {
+inline filesystem::path compat_relative(filesystem::path path, filesystem::path base) {
     return path.string().substr(base.string().size());
 }
 
