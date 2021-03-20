@@ -1,21 +1,22 @@
 
+#include "env.h"
 #include "filesystem.h"
 #include "os.h"
-#include <cstdlib>
 #include <iostream>
 #include <numeric>
 #include <vector>
 
+namespace {
+
 #ifdef MATMAKE_USING_WINDOWS
 
-int setenv(const char *name, const char *value, int overwrite) {
-    //    auto s = std::string{name} + "=" + value;
-    return _putenv_s(name, value);
-}
+constexpr const char *msvcPathName = "PATH";
+
+#else
+
+constexpr const char *msvcPathName = "WINEPATH";
 
 #endif
-
-namespace {
 
 //! Get the first folder in the path
 filesystem::path getHighest(filesystem::path path) {
@@ -40,15 +41,22 @@ std::string concatPaths(std::vector<filesystem::path> paths) {
                            });
 }
 
+filesystem::path cSpelling() {
+    if (usingMingw()) {
+        return filesystem::path{"C:/"};
+    }
+    return filesystem::path{"C:\\"};
+}
+
 } // namespace
 
 void setMsvcEnvironment() {
     filesystem::path driveC = [] {
         if (getOs() == Os::Windows) {
-            return filesystem::path{"C:"};
+            return cSpelling();
         }
         else {
-            auto home = filesystem::path{getenv("HOME")};
+            auto home = filesystem::path{getEnvVar("HOME")};
             return filesystem::path{home / ".wine" / "drive_c"};
         }
     }();
@@ -63,7 +71,8 @@ void setMsvcEnvironment() {
                 return it.path();
             }
         }
-        throw std::runtime_error{"no program files folder was found"};
+        throw std::runtime_error{"no program files folder was found in " +
+                                 driveC.string()};
     }();
 
     auto winSdk = programFiles / "Windows Kits" / "10";
@@ -72,24 +81,20 @@ void setMsvcEnvironment() {
     auto msvcPath = getHighest(getHighest(vsSdk) / "VC" / "Tools" / "MSVC");
 
     {
-        // WINEPATH
+        // WINEPATH/PATH
         auto paths = std::vector{
             //            getHighest(vsSdk) / "Common7" / "IDE", // Required?
             msvcPath / "bin" / "Hostx86" / "x64",
         };
 
-        auto regular = "C:\\windows;C:\\windows\\system32";
-
         for (auto &path : paths) {
             if (!filesystem::exists(path)) {
                 std::cerr << "cannot find path " << path << "\n";
             }
-            path = "C:" / compat_relative(path, driveC);
+            path = cSpelling() / compat_relative(path, driveC);
         }
 
-        auto path = regular + concatPaths(paths);
-
-        setenv("WINEPATH", path.c_str(), 1);
+        appendEnv(msvcPathName, concatPaths(paths));
     }
 
     {
@@ -110,12 +115,10 @@ void setMsvcEnvironment() {
             if (!filesystem::exists(include)) {
                 std::cerr << "cannot find path " << include << "\n";
             }
-            include = "C:" / compat_relative(include, driveC);
-            //            std::cout << include << std::endl;
+            include = cSpelling() / compat_relative(include, driveC);
         }
 
-        auto str = concatPaths(includes);
-        setenv("INCLUDE", str.c_str(), 1);
+        appendEnv("INCLUDE", concatPaths(includes));
     }
 
     {
@@ -134,10 +137,9 @@ void setMsvcEnvironment() {
             if (!filesystem::exists(lib)) {
                 std::cerr << "cannot find path " << lib << "\n";
             }
-            lib = "C:" / compat_relative(lib, driveC);
+            lib = cSpelling() / compat_relative(lib, driveC);
         }
 
-        auto str = concatPaths(libPaths);
-        setenv("LIB", str.c_str(), 1);
+        appendEnv("LIB", concatPaths(libPaths));
     }
 }
