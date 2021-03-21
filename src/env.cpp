@@ -2,6 +2,7 @@
 //! Variables
 
 #include "os.h"
+#include <array>
 #include <cstdlib>
 #include <string>
 
@@ -22,19 +23,18 @@ std::string getEnvVar(std::string name) {
 
 #else
 
+#include <Windows.h>
+
 int setenv(const char *name, const char *value, int overwrite) {
-    return _putenv_s(name, value);
+    return -!SetEnvironmentVariableA(name, value);
 }
 
 std::string getEnvVar(std::string name) {
-    size_t size;
-    getenv_s(&size, 0, 0, name.c_str());
+    auto arr = std::array<char, 9000>{};
 
-    std::string var;
-    var.resize(size);
-    getenv_s(&size, var.data(), size, name.c_str());
+    size_t size = GetEnvironmentVariableA(name.c_str(), arr.data(), arr.size());
 
-    return var;
+    return std::string(arr.data(), size);
 }
 
 #endif
@@ -48,7 +48,9 @@ std::string getEnvVar(std::string name) {
 #endif
 
 void appendEnv(std::string name, std::string value) {
-    value = getEnvVar(name) + value;
+    auto oldVar = getEnvVar(name);
+
+    value = oldVar + value;
 
     setenv(name.c_str(), value.c_str(), 1);
 }
