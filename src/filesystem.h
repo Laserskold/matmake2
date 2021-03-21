@@ -45,7 +45,7 @@ inline filesystem::path compat_relative(filesystem::path path,
 
 #ifdef MATMAKE_USING_WINDOWS
 
-filesystem::path normalizePath(std::string path) {
+inline filesystem::path normalizePath(std::string path) {
     for (auto &c : path) {
         if (c == '/') {
             c = '\\';
@@ -54,13 +54,17 @@ filesystem::path normalizePath(std::string path) {
     return filesystem::path{path};
 }
 
-filesystem::path normalizePath(filesystem::path path) {
+inline filesystem::path normalizePath(filesystem::path path) {
     return normalizePath(path.string());
 }
 
 #else
 
-filesystem::path normalizePath(filesystem::path path) {
+inline filesystem::path normalizePath(std::string path) {
+    return filesystem::path{path};
+}
+
+inline filesystem::path normalizePath(filesystem::path path) {
     return path;
 }
 
