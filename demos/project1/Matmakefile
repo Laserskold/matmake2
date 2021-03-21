@@ -1,10 +1,14 @@
 
 main
   src = src/*.cpp
+  out = main
   config =
     debug
     c++17
   command = [exe]
+  includes =
+    src
+    include
 
 all
   in = @main

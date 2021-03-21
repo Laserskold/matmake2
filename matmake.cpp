@@ -2,6 +2,7 @@
 //! Seems to speed up build around 4x
 
 #include "src/defaultfile.cpp"
+#include "src/env.cpp"
 #include "src/exampleproject.cpp"
 #include "src/matmakefile.cpp"
 #include "src/msvcenvironment.cpp"

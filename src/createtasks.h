@@ -207,19 +207,19 @@ inline std::pair<TaskList, Task *> createTree(
         style = task.flagStyle();
     }
     if (auto p = root.property("dir")) {
-        task.dir(BuildLocation::Real, p->value());
+        task.dir(BuildLocation::Real, p->path());
     }
     if (auto p = root.property("objdir")) {
-        task.dir(BuildLocation::Intermediate, p->value());
+        task.dir(BuildLocation::Intermediate, p->path());
     }
     if (auto p = root.property("cxx")) {
-        task.cxx(p->value());
+        task.cxx(p->path());
     }
     if (auto p = root.property("cc")) {
-        task.cc(p->value());
+        task.cc(p->path());
     }
     if (auto p = root.property("ar")) {
-        task.ar(p->value());
+        task.ar(p->path());
     }
     if (auto p = root.property("command")) {
         task.command(p->value());
@@ -227,7 +227,7 @@ inline std::pair<TaskList, Task *> createTree(
     if (auto p = root.property("src")) {
         // Requires command to be red before becauso of flag style
         for (auto &src : p->values) {
-            auto paths = expandPaths(src);
+            auto paths = expandPaths(normalizePath(src));
 
             for (auto &path : paths) {
                 if (auto f = duplicateMap.find(path); f != duplicateMap.end()) {
@@ -277,7 +277,7 @@ inline std::pair<TaskList, Task *> createTree(
         }
     }
     if (auto p = root.property("out")) {
-        task.out(p->value());
+        task.out(p->path());
     }
     if (auto p = root.property("flags")) {
         task.flags(p->concat());
@@ -294,7 +294,7 @@ inline std::pair<TaskList, Task *> createTree(
         }
     }
     if (auto p = root.property(("depprefix"))) {
-        task.depfile(p->value());
+        task.depfile(p->path());
     }
     if (auto p = root.property("config")) {
         task.config(p->values);

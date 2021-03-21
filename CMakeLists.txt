@@ -30,6 +30,7 @@ add_library(
    "src/translateconfig.cpp"
    "src/msvcenvironment.cpp"
    "src/exampleproject.cpp"
+   "src/env.cpp"
 )
 
 add_subdirectory(lib/json.h)
