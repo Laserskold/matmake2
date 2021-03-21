@@ -2,6 +2,7 @@
 
 #include "task.h"
 #include "json/json.h"
+#include <algorithm>
 #include <string>
 
 struct Property {
@@ -40,6 +41,12 @@ struct Property {
                 values.front()};
         }
         return values.front();
+    }
+
+    //! Convert to a filesystem path with the right separater type
+    filesystem::path path() const {
+        auto value = this->value();
+        return normalizePath(value);
     }
 
     std::string concat() const {

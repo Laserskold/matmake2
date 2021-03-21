@@ -1,5 +1,7 @@
 #pragma once
 
+#include "os.h"
+
 #ifdef USE_EXPERIMENTAL_FILESYSTEM
 
 // Se below
@@ -27,7 +29,8 @@ namespace filesystem = std::experimental::filesystem;
 
 //! Compatabilityt function, that only removes the first part of a path,
 //! It is enough for the usecases of this project though
-inline filesystem::path compat_relative(filesystem::path path, filesystem::path base) {
+inline filesystem::path compat_relative(filesystem::path path,
+                                        filesystem::path base) {
     return path.string().substr(base.string().size());
 }
 
@@ -36,6 +39,29 @@ inline filesystem::path compat_relative(filesystem::path path, filesystem::path 
 inline filesystem::path compat_relative(filesystem::path path,
                                         filesystem::path base) {
     return filesystem::relative(path, base);
+}
+
+#endif
+
+#ifdef MATMAKE_USING_WINDOWS
+
+filesystem::path normalizePath(std::string path) {
+    for (auto &c : path) {
+        if (c == '/') {
+            c = '\\';
+        }
+    }
+    return filesystem::path{path};
+}
+
+filesystem::path normalizePath(filesystem::path path) {
+    return normalizePath(path.string());
+}
+
+#else
+
+filesystem::path normalizePath(filesystem::path path) {
+    return path;
 }
 
 #endif

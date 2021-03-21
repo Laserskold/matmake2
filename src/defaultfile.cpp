@@ -59,36 +59,46 @@ bool hasCommand(std::string command) {
                                  std::to_string(__LINE__) +
                                  " is not implemented "};
     }
-} // namespace
+}
 
 std::string getHighestClang() {
-   if (getOs() == Os::Windows) {
-      return "clang++.exe";
-   }
+    if (getOs() == Os::Windows) {
+        return "clang++.exe";
+    }
 
-   for (size_t i = 20; i > 2; --i) {
-      auto command = "clang++-" + std::to_string(i);
-      if (hasCommand(command)) {
-         return command;
-      }
-   }
+    for (size_t i = 20; i > 2; --i) {
+        auto command = "clang++-" + std::to_string(i);
+        if (hasCommand(command)) {
+            return command;
+        }
+    }
 
-   return "clang++";
+    return "clang++";
 }
 
 std::string getHighestGcc() {
-   if (getOs() == Os::Windows) {
-      return "g++.exe";
-   }
+    if (getOs() == Os::Windows) {
+        return "g++.exe";
+    }
 
-   for (size_t i = 20; i > 2; --i) {
-      auto command = "g++-" + std::to_string(i);
-      if (hasCommand(command)) {
-         return command;
-      }
-   }
+    for (size_t i = 20; i > 2; --i) {
+        auto command = "g++-" + std::to_string(i);
+        if (hasCommand(command)) {
+            return command;
+        }
+    }
 
-   return "g++";
+    return "g++";
+}
+
+void normalize(Json &json) {
+#ifdef MATMAKE_USING_WINDOWS
+    for (auto &c : json.value) {
+        if (c == '/') {
+            c = '\\';
+        }
+    }
+#endif
 }
 
 } // namespace

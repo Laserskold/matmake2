@@ -48,9 +48,12 @@ native::CommandStatus native::copy(const Task &task) {
 
     std::cout << (in.string() + " --> " + out.string()) << std::endl;
 
+#ifndef MATMAKE_USING_WINDOWS
+    // This causes a crash on msvc..
     if (filesystem::equivalent(in, out)) {
         return CommandStatus::Normal;
     }
+#endif
 
     filesystem::copy(in, out, filesystem::copy_options::overwrite_existing, ec);
 
