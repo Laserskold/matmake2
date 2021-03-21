@@ -160,6 +160,11 @@ PrescanResult parseExpandedFile(filesystem::path expandedFile,
 
 PrescanResult prescan(Task &task) {
     auto expandedFile = task.out();
+
+    if (task.in().empty()) {
+        throw std::runtime_error{"error: in prescan(): task " + task.name() +
+                                 " does not have in tasks"};
+    }
     auto source = task.in().front()->out();
     auto jsonFile = task.dir() / (source.string() + ".json");
 
@@ -215,8 +220,7 @@ void prescan(TaskList &tasks) {
     std::vector<std::pair<Task *, std::string>> connections;
 
     for (auto &task : tasks) {
-        if (auto t = getType(task->out());
-            t == SourceType::ExpandedModuleSource) {
+        if (task->shouldPrescan()) {
             auto prescanResult = prescan(*task);
 
             auto pcm = task->parent();

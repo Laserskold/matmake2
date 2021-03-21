@@ -277,6 +277,13 @@ int main(int argc, char **argv) {
         std::cerr << "error: " << e.what() << "\n";
         return 1;
     }
+    catch (std::exception &e) {
+        std::cerr << "error: " << e.what() << "\n";
+    }
+
+    catch (...) {
+        std::cerr << "unknown error\n";
+    }
 
     return 0;
 }

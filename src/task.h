@@ -740,6 +740,11 @@ public:
         return _shouldLinkFile;
     }
 
+    bool shouldPrescan() {
+        return getType(out()) == SourceType::ExpandedModuleSource &&
+               _command == "[cxxm]";
+    }
+
     Json dump();
 
     //! Print tree view from node

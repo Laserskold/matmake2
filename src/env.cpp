@@ -10,7 +10,7 @@
 
 #if defined(__MINGW32__) || defined(__CYGWIN__)
 
-extern "C" int putenv(char *);
+extern "C" int putenv(const char *);
 
 void setenv(const char *name, const char *value, int overwrite) {
     auto arg = std::string{name} + value;
