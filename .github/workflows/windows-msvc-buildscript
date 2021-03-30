@@ -1,0 +1,28 @@
+name: Windows
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Update submodules
+      run: git submodule update --init
+
+    - name: Build
+      shell: bash
+      run: build-win-msvc.bat
+
+    - name: Test
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: matmake2.exe --help
