@@ -28,4 +28,8 @@ jobs:
       run: build/clang/matmake2 --init test
     - name: build example project
       run: build/clang/matmake2 -C test --target gcc
+    - name: Build demo project1
+      run: build/clang/matmake2 -C build/clang/demos/project1 --target clang
+    - name: Build demo module project
+      run: build/clang/matmake2 -C build/clang/demos/modules --target clang
 

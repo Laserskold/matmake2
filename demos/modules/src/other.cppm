@@ -3,7 +3,7 @@
 
 export module other;
 
-import other2;
+export import other2;
 
 // Compile with commands
 // clang++-11 -std=c++2a -fmodules-ts -c src/test.pcm  -o src/test.o

@@ -8,3 +8,5 @@ main
 
 all
   in = @main
+  includes =
+    include

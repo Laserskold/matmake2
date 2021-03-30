@@ -75,6 +75,7 @@ PrescanResult parseExpandedFile(filesystem::path expandedFile,
 
     // Do some more fancy way to detect all cases here
     constexpr auto importStatement = std::string_view{"import "};
+    constexpr auto exportImportStatement = std::string_view{"export import "};
     constexpr auto exportStatement = std::string_view{"export module "};
 
     auto ret = PrescanResult{};
@@ -85,7 +86,14 @@ PrescanResult parseExpandedFile(filesystem::path expandedFile,
         if (line.empty()) {
             continue;
         }
-        if (line.rfind(importStatement, 0) == 0) {
+        if (line.rfind(exportImportStatement, 0) == 0) {
+            if (auto f = line.find(';'); f != std::string::npos) {
+                ret.imports.push_back(
+                    {line.begin() + exportImportStatement.size(),
+                     line.begin() + f});
+            }
+        }
+        else if (line.rfind(importStatement, 0) == 0) {
             if (auto f = line.find(';'); f != std::string::npos) {
                 ret.imports.push_back(
                     {line.begin() + importStatement.size(), line.begin() + f});
