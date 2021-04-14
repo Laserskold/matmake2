@@ -82,6 +82,6 @@ void createExampleProject(filesystem::path path) {
     auto gitignorePath = path / ".gitignore";
     std::ofstream{gitignorePath} << "build/\n";
 
-    auto clangFormatPath = path / ".clangformat";
+    auto clangFormatPath = path / ".clang-format";
     std::ofstream{clangFormatPath} << exampleClangFormat;
 }
