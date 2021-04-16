@@ -79,7 +79,6 @@ int parseTasksCommand(const Settings settings) {
 int execute(std::string filename, filesystem::path path) {
     auto originalPath = filesystem::absolute(filesystem::current_path());
     filesystem::current_path(path);
-    std::cout << "running " << filename << " in " << path << std::endl;
 
     if constexpr (getOs() == Os::Linux) {
         filename = "./" + filename;
@@ -105,14 +104,34 @@ int test(const TaskList &tasks, const Settings &settings) {
             ++numTests;
             auto exe = task->out();
             auto path = exe.parent_path();
-            auto command = exe.filename();
-            if (execute(command.string(), path)) {
+            auto logFile =
+                task->dir(BuildLocation::Intermediate) / task->name();
+            logFile.replace_extension(".txt");
+            logFile = filesystem::absolute(logFile);
+            auto name = task->name();
+
+            auto command = exe.filename().string() + " > " + logFile.string();
+            std::cout << name << ":";
+            std::cout.width(name.size() < 40 ? 40 - name.size() : 0);
+            std::cout.fill(' ');
+            std::cout << " running in " << path << std::endl;
+            if (execute(command, path)) {
                 ++failedTests;
 
-                results.push_back("failed            " + command.string());
+                std::cout << "\n" << name << " failed:\n";
+                std::cout << "---------------------------------------------\n";
+
+                auto file = std::ifstream{logFile};
+                for (std::string line; getline(file, line);) {
+                    std::cout << line << "\n";
+                }
+                std::cout << "--------- end test --------------------------\n";
+                std::cout.flush();
+
+                results.push_back("failed            " + exe.string());
             }
             else {
-                results.push_back("success           " + command.string());
+                results.push_back("success           " + exe.string());
             }
         }
     }
