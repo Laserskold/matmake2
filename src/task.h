@@ -284,8 +284,16 @@ public:
     }
 
     std::string includes() const {
-        if (_includes.empty() && _parent) {
-            return parent()->includes();
+        if (_parent) {
+            auto parentIncludes = parent()->includes();
+            auto includeStr = concatIncludes();
+            if (parentIncludes.empty()) {
+                return includeStr;
+            }
+            if (includeStr.empty()) {
+                return parentIncludes;
+            }
+            return parentIncludes + " " + includeStr;
         }
         else {
             return concatIncludes();
@@ -293,6 +301,9 @@ public:
     }
 
     std::string concatIncludes() const {
+        if (_includes.empty()) {
+            return {};
+        }
         std::ostringstream ss;
 
         auto includePrefix = ::includePrefix(flagStyle());
@@ -301,7 +312,12 @@ public:
             ss << includePrefix << i << " ";
         }
 
-        return ss.str();
+        auto str = ss.str();
+
+        if (!str.empty() && str.back() == ' ') {
+            str.pop_back();
+        }
+        return str;
     }
 
     void pushInclude(std::string includes) {
