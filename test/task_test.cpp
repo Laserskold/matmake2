@@ -75,4 +75,19 @@ TEST_CASE("property: build-location") {
     EXPECT_EQ(subtask.dir(), "obj/gcc");
 }
 
+TEST_CASE("property: includes") {
+    auto task = Task{};
+
+    auto parentTask = Task{};
+    parentTask.pushInclude("test2");
+    parentTask.pushIn(&task);
+
+    auto grandParentTask = Task{};
+    grandParentTask = Task{};
+    grandParentTask.pushInclude("test1");
+    grandParentTask.pushIn(&parentTask);
+
+    EXPECT_EQ(task.includes(), "-Itest1 -Itest2");
+}
+
 TEST_SUIT_END
