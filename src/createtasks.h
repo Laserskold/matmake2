@@ -194,7 +194,14 @@ inline std::pair<TaskList, Task *> createTree(
     FlagStyle style) {
     TaskList taskList;
 
-    auto in = root.property("in");
+    if (auto f = std::find_if(duplicateMap.begin(),
+                              duplicateMap.end(),
+                              [name = root.name()](auto &&it) {
+                                  return it.second->name() == name;
+                              });
+        f != duplicateMap.end()) {
+        return {TaskList{}, f->second};
+    }
 
     auto &task = taskList.emplace();
 
@@ -255,7 +262,7 @@ inline std::pair<TaskList, Task *> createTree(
             taskList.insert(std::move(list));
         }
     }
-    if (in) {
+    if (auto in = root.property("in"); in) {
         // Its important that targets from in is included after src
         // otherwise there could be problems with linking to for example .a
         // files
@@ -308,6 +315,8 @@ inline std::pair<TaskList, Task *> createTree(
     }
 
     task.generateDepName();
+
+    duplicateMap[task.out()] = &task;
 
     return {std::move(taskList), &task};
 }
