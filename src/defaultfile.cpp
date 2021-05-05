@@ -20,7 +20,7 @@ const char *gccSource = R"_(
       "exe": "{c++} {in} -o {out} {ldflags} {flags} {includes}",
       "gch": "{c++} {in} -o {out} {depfile} {cxxflags} {flags} {includes}",
       "eem": "{c++} {in} {standard} {includes} {eflags} -E > {out}",
-      "pcm": "{c++} {cxxflags} {flags} {includes} {modules} --precompile -x c++-module {src} -o {out} ",
+      "pcm": "{c++} -c {cxxflags} {flags} {includes} {modules} -Xclang -emit-module-interface -x c++ {src} -o {out} ",
       "cxxm": "{c++} -c {in} -o {out} ",
       "static": "{ar} -rs {out} {in}"
     }
@@ -62,33 +62,33 @@ bool hasCommand(std::string command) {
 } // namespace
 
 std::string getHighestClang() {
-   if (getOs() == Os::Windows) {
-      return "clang++.exe";
-   }
+    if (getOs() == Os::Windows) {
+        return "clang++.exe";
+    }
 
-   for (size_t i = 20; i > 2; --i) {
-      auto command = "clang++-" + std::to_string(i);
-      if (hasCommand(command)) {
-         return command;
-      }
-   }
+    for (size_t i = 20; i > 2; --i) {
+        auto command = "clang++-" + std::to_string(i);
+        if (hasCommand(command)) {
+            return command;
+        }
+    }
 
-   return "clang++";
+    return "clang++";
 }
 
 std::string getHighestGcc() {
-   if (getOs() == Os::Windows) {
-      return "g++.exe";
-   }
+    if (getOs() == Os::Windows) {
+        return "g++.exe";
+    }
 
-   for (size_t i = 20; i > 2; --i) {
-      auto command = "g++-" + std::to_string(i);
-      if (hasCommand(command)) {
-         return command;
-      }
-   }
+    for (size_t i = 20; i > 2; --i) {
+        auto command = "g++-" + std::to_string(i);
+        if (hasCommand(command)) {
+            return command;
+        }
+    }
 
-   return "g++";
+    return "g++";
 }
 
 } // namespace
