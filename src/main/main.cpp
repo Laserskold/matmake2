@@ -3,6 +3,7 @@
 #include "coordinator.h"
 #include "createtasks.h"
 #include "filesystem.h"
+#include "makefile.h"
 #include "matmakefile.h"
 #include "msvcenvironment.h"
 #include "parsematmakefile.h"
@@ -282,7 +283,9 @@ int main(int argc, char **argv) {
             break;
         case Command::Build:
         case Command::BuildAndTest: {
-            return build(settings);
+            //            return build(settings);
+            return printMakefile(settings,
+                                 createTasksFromMatmakefile(settings));
         } break;
         case Command::List: {
             return list(settings);

@@ -3,6 +3,7 @@
 
 #include "src/defaultfile.cpp"
 #include "src/exampleproject.cpp"
+#include "src/makefile.cpp"
 #include "src/matmakefile.cpp"
 #include "src/msvcenvironment.cpp"
 #include "src/nativecommands.cpp"

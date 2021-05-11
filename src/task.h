@@ -136,10 +136,11 @@ public:
             if (!in->shouldLinkFile()) {
                 continue;
             }
-            else if (ext == ".gch" || ext == ".pch" || ext == "") {
-                fname.replace_extension("");
-                ret += " -include " + fname.string() + " ";
-            }
+            //            else if (ext == ".gch" || ext == ".pch" || ext == "")
+            //            {
+            //                fname.replace_extension("");
+            //                ret += " -include " + fname.string() + " ";
+            //            }
             else {
                 ret += fname.string() + " ";
             }
