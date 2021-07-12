@@ -105,6 +105,18 @@ Json defaultCompiler() {
         return json;
     };
 
+    auto createEmscriptenVersion = [](Json json) {
+        json["name"] = "em";
+        json["dir"] = "build/em";
+        json["objdir"] = "build/.matmake/obj/em";
+        json["cxx"] = "em++";
+        json["ar"] = "emar";
+        json["commands"]["exe"] =
+            "{c++} {in} -o {out}.html {ldflags} {flags} {includes}";
+
+        return json;
+    };
+
     // -- gcc --
 
     auto gcc = Json::Parse(gccSource);
@@ -122,6 +134,15 @@ Json defaultCompiler() {
     ret.push_back(clang);
     ret.push_back(createDebugVersion(clang));
 
+    // --- emscripten ---
+
+    auto emscripten = createEmscriptenVersion(gcc);
+
+    ret.push_back(emscripten);
+    ret.push_back(createDebugVersion(emscripten));
+
+    // --- msvc and wine ---
+
     auto createWineVersion = [](Json json) {
         json["name"].value = "wine-msvc";
         json["dir"].value = "build/wine-msvc";
@@ -131,8 +152,6 @@ Json defaultCompiler() {
 
         return json;
     };
-
-    // --- msvc and wine ---
 
     auto msvc = Json::Parse(msvcSource);
     ret.push_back(msvc);
