@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 enum Os {
     Linux,
     Windows,
@@ -15,3 +17,5 @@ constexpr Os getOs() {
     return Os::Linux;
 #endif
 }
+
+bool hasCommand(std::string command);

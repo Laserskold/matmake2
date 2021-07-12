@@ -1,5 +1,6 @@
 #include "settings.h"
 #include "exampleproject.h"
+#include "os.h"
 #include <iostream>
 #include <sstream>
 #include <thread>
@@ -15,7 +16,8 @@ options:
 --verbose -v          print extra information
 -C [dir]              run in another directory
 -j                    set number of worker threads
---target -t [target]  select target (eg g++, clang++, msvc)
+--backend -b          what build backend to use (ninja, native or makefile)
+--target -t [target]  select target (eg gcc, clang, msvc + gcc-debug etc)
 --clean               remove all built file
 --list                list available targets
 --test                run all targets marked with [test]
@@ -37,6 +39,49 @@ long toI(std::string str) {
     long l;
     ss >> l;
     return l;
+}
+
+bool hasNinja() {
+    return hasCommand("ninja");
+}
+
+bool hasMake() {
+    return hasCommand("make");
+}
+
+Backend toBackend(std::string str) {
+    if (str == "native") {
+        return Backend::Native;
+    }
+
+    if (str == "makefile") {
+        return Backend::Makefile;
+    }
+
+    if (str == "ninja") {
+        return Backend::Ninja;
+    }
+
+    if (str == "default") {
+        return Backend::Default;
+    }
+
+    std::cerr << str << " is not a valid backend: select one of the following\n"
+              << "  native\n  makefile\n  ninja (default)\n";
+
+    std::exit(0);
+}
+
+Backend defaultBackend() {
+    if (hasNinja()) {
+        return Backend::Ninja;
+    }
+
+    if (hasMake()) {
+        return Backend::Makefile;
+    }
+
+    return Backend::Native;
 }
 
 } // namespace
@@ -108,6 +153,11 @@ Settings::Settings(int argc, char **argv) {
         else if (arg == "--msvc-wine") {
             useMsvcEnvironment = true;
         }
+        else if (arg == "--backend" || arg == "-b") {
+            ++i;
+            arg = args.at(i);
+            backend = toBackend(arg);
+        }
         else if (arg == "--init") {
             ++i;
             if (i >= args.size()) {
@@ -124,5 +174,9 @@ Settings::Settings(int argc, char **argv) {
 
     if (numThreads == 0) {
         numThreads = std::thread::hardware_concurrency();
+    }
+
+    if (backend == Backend::Default) {
+        backend = defaultBackend();
     }
 }

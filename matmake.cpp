@@ -8,6 +8,7 @@
 #include "src/matmakefile.cpp"
 #include "src/msvcenvironment.cpp"
 #include "src/nativecommands.cpp"
+#include "src/os.cpp"
 #include "src/parsematmakefile.cpp"
 #include "src/settings.cpp"
 #include "src/task.cpp"
