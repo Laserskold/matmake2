@@ -1,13 +1,11 @@
-#include "makefile.h"
-#include "createtasks.h"
-#include "tasklist.h"
-#include <fstream>
+#include "ninja.h"
 #include "test.h"
+#include <fstream>
+#include <iostream>
 
 namespace {
 
-void writeToFile(filesystem::path dir, const TaskList &tasks) {
-
+void writeNinjaToFile(filesystem::path dir, const TaskList &tasks) {
     std::ofstream file{dir};
 
     if (!file) {
@@ -15,7 +13,17 @@ void writeToFile(filesystem::path dir, const TaskList &tasks) {
                                  dir.string()};
     }
 
-    std::cout << "printing makefile..." << std::endl;
+    std::cout << "printing build.ninja..." << std::endl;
+
+    file << "# Ninja file generated with matmake2\n\n";
+
+    file << "builddir = " << dir.parent_path().string() << "\n\n";
+
+    file << "rule run\n";
+    file << "    command = $cmd\n\n";
+
+    file << "rule copy\n";
+    file << "    command = cp -u $in $out\n\n";
 
     for (auto &task : tasks) {
         auto rawCommand = task->command();
@@ -27,7 +35,6 @@ void writeToFile(filesystem::path dir, const TaskList &tasks) {
         if (out.empty()) {
             out = name;
         }
-
 
         if (in.empty() && !task->in().empty()) {
             for (auto &i : task->in()) {
@@ -44,24 +51,31 @@ void writeToFile(filesystem::path dir, const TaskList &tasks) {
         if (in.empty() && rawCommand.empty()) {
             continue;
         }
-        file << out.string() << ": " << in << "\n";
         if (rawCommand == "none") {
             continue;
         }
         if (rawCommand == "copy") {
-            file << "\t"
-                 << "cp -u " << in << " " << task->out().string() << "\n";
+            file << "build " << task->out().string() << ": copy " << in
+                 << "\n\n";
         }
         else {
             auto command = ProcessedCommand{rawCommand}.expand(*task);
-            file << "\t" << command << "\n";
+
+            if (command.empty()) {
+                file << "build " << task->name() << ": phony " << in << "\n\n";
+            }
+            else {
+                file << "build " << task->out().string() << ": run " << in
+                     << "\n";
+                file << "    cmd = " << command << "\n\n";
+            }
         }
     }
 }
 
 } // namespace
 
-int printMakefile(const Settings &settings, const TaskList &tasks) {
+int printNinja(const Settings &settings, const TaskList &tasks) {
     if (settings.target.empty()) {
         throw std::runtime_error{
             "no target specified. Use \"--target\" to specify"};
@@ -77,19 +91,17 @@ int printMakefile(const Settings &settings, const TaskList &tasks) {
         throw std::runtime_error{"could not find target " + settings.target};
     }
 
-        root->print(settings.verbose);
-
     createDirectories(tasks);
 
-    auto dir = root->dir(BuildLocation::Intermediate) / "Makefile";
+    auto dir = root->dir(BuildLocation::Intermediate) / "build.ninja";
 
-    writeToFile(dir, tasks);
+    writeNinjaToFile(dir, tasks);
 
-    std::cout << "running makefile..." << std::endl;
+    std::cout << "running ninja..." << std::endl;
 
     if (!settings.skipBuild) {
         std::cout.flush();
-        auto status = system(("make -j -f " + dir.string()).c_str());
+        auto status = system(("ninja -f " + dir.string()).c_str());
 
         if (status) {
             std::cout << "failed...\n";
@@ -103,9 +115,9 @@ int printMakefile(const Settings &settings, const TaskList &tasks) {
         }
     }
 
-        if (settings.command == Command::BuildAndTest) {
-            return test(tasks, settings);
-        }
+    if (settings.command == Command::BuildAndTest) {
+        return test(tasks, settings);
+    }
 
     return 0;
 }

@@ -6,6 +6,7 @@
 #include "makefile.h"
 #include "matmakefile.h"
 #include "msvcenvironment.h"
+#include "ninja.h"
 #include "parsematmakefile.h"
 #include "settings.h"
 #include "tasklist.h"
@@ -51,7 +52,7 @@ int parseTasksCommand(const Settings settings) {
             std::cout << "\n"
                          "treeview\n"
                          "==================\n";
-            auto &root = *tasks->find("@g++");
+            auto &root = *tasks->find("@" + settings.target);
             root.print(settings.verbose);
         }
 
@@ -210,9 +211,19 @@ int main(int argc, char **argv) {
             break;
         case Command::Build:
         case Command::BuildAndTest: {
-            //            return build(settings);
-            return printMakefile(settings,
-                                 createTasksFromMatmakefile(settings));
+            switch (settings.backend) {
+            case Backend::Default:
+            case Backend::Ninja:
+                return printNinja(settings,
+                                  createTasksFromMatmakefile(settings));
+                break;
+            case Backend::Makefile:
+                return printMakefile(settings,
+                                     createTasksFromMatmakefile(settings));
+                break;
+            case Backend::Native:
+                return build(settings);
+            }
         } break;
         case Command::List: {
             return list(settings);
