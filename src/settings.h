@@ -29,7 +29,7 @@ struct Settings {
     bool useMsvcEnvironment = false;
     std::string target = "";
     size_t numThreads = 0;
-    Backend backend = Backend::Ninja;
+    Backend backend = Backend::Default;
 
     Command command = Command::Build;
 
