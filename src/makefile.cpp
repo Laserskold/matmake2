@@ -2,6 +2,7 @@
 #include "createtasks.h"
 #include "tasklist.h"
 #include <fstream>
+#include "test.h"
 
 namespace {
 
@@ -108,9 +109,9 @@ int printMakefile(const Settings &settings, const TaskList &tasks) {
         }
     }
 
-    //    if (settings.command == Command::BuildAndTest) {
-    //        return test(tasks, settings);
-    //    }
+        if (settings.command == Command::BuildAndTest) {
+            return test(tasks, settings);
+        }
 
     return 0;
 }
