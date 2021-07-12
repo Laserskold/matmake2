@@ -31,6 +31,18 @@ developer options:
 --print-tasks         print list of tasks
 --debug -d            print debugging information
 
+possible targets:
+  gcc
+  gcc-debug
+  clang
+  clang-debug
+  msvc
+  msvc-debug
+  msvc-wine
+  msvc-wine-debug
+  em
+  em-debug
+
 )_";
 
 // Because stoi and stol does not seem to work on msvc
