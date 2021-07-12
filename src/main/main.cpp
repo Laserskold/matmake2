@@ -3,11 +3,14 @@
 #include "coordinator.h"
 #include "createtasks.h"
 #include "filesystem.h"
+#include "makefile.h"
 #include "matmakefile.h"
 #include "msvcenvironment.h"
+#include "ninja.h"
 #include "parsematmakefile.h"
 #include "settings.h"
 #include "tasklist.h"
+#include "test.h"
 #include "json/json.h"
 
 namespace {
@@ -49,7 +52,7 @@ int parseTasksCommand(const Settings settings) {
             std::cout << "\n"
                          "treeview\n"
                          "==================\n";
-            auto &root = *tasks->find("@g++");
+            auto &root = *tasks->find("@" + settings.target);
             root.print(settings.verbose);
         }
 
@@ -74,80 +77,6 @@ int parseTasksCommand(const Settings settings) {
     std::cerr << "could not open task file\n";
 
     return 1;
-}
-
-int execute(std::string filename, filesystem::path path) {
-    auto originalPath = filesystem::absolute(filesystem::current_path());
-    filesystem::current_path(path);
-
-    if constexpr (getOs() == Os::Linux) {
-        filename = "./" + filename;
-    }
-
-    auto res = std::system(filename.c_str());
-
-    filesystem::current_path(originalPath);
-
-    return res;
-}
-
-int test(const TaskList &tasks, const Settings &settings) {
-    std::vector<const Task *> tests;
-
-    size_t failedTests = 0;
-    size_t numTests = 0;
-
-    std::vector<std::string> results;
-
-    for (auto &task : tasks) {
-        if (task->isTest()) {
-            ++numTests;
-            auto exe = task->out();
-            auto path = exe.parent_path();
-            auto logFile =
-                task->dir(BuildLocation::Intermediate) / task->name();
-            logFile.replace_extension(".txt");
-            logFile = filesystem::absolute(logFile);
-            auto name = task->name();
-
-            auto command = exe.filename().string() + " > " + logFile.string();
-            std::cout << name << ":";
-            std::cout.width(name.size() < 40 ? 40 - name.size() : 0);
-            std::cout.fill(' ');
-            std::cout << " running in " << path << std::endl;
-            if (execute(command, path)) {
-                ++failedTests;
-
-                std::cout << "\n" << name << " failed:\n";
-                std::cout << "---------------------------------------------\n";
-
-                auto file = std::ifstream{logFile};
-                for (std::string line; getline(file, line);) {
-                    std::cout << line << "\n";
-                }
-                std::cout << "--------- end test --------------------------\n";
-                std::cout.flush();
-
-                results.push_back("failed            " + exe.string());
-            }
-            else {
-                results.push_back("success           " + exe.string());
-            }
-        }
-    }
-
-    std::cout << "\n\n==== Test summary: ========================== \n";
-
-    for (auto &result : results) {
-        std::cout << result << "\n";
-    }
-
-    std::cout << "\n";
-
-    std::cout << failedTests << " failed of " << numTests << " tests "
-              << std::endl;
-
-    return failedTests > 0;
 }
 
 void outputCompileCommands(const TaskList &tasks) {
@@ -282,7 +211,19 @@ int main(int argc, char **argv) {
             break;
         case Command::Build:
         case Command::BuildAndTest: {
-            return build(settings);
+            switch (settings.backend) {
+            case Backend::Default:
+            case Backend::Ninja:
+                return printNinja(settings,
+                                  createTasksFromMatmakefile(settings));
+                break;
+            case Backend::Makefile:
+                return printMakefile(settings,
+                                     createTasksFromMatmakefile(settings));
+                break;
+            case Backend::Native:
+                return build(settings);
+            }
         } break;
         case Command::List: {
             return list(settings);

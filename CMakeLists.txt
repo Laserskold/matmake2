@@ -15,21 +15,22 @@ find_package( Threads )
 add_library(
    matmake2-core
    STATIC
+
+   "src/defaultfile.cpp"
+   "src/exampleproject.cpp"
+   "src/execute.cpp"
+   "src/makefile.cpp"
+   "src/matmakefile.cpp"
+   "src/msvcenvironment.cpp"
+   "src/nativecommands.cpp"
+   "src/ninja.cpp"
+   "src/os.cpp"
+   "src/parsematmakefile.cpp"
+   "src/settings.cpp"
    "src/task.cpp"
    "src/tasklist.cpp"
-   "src/nativecommands.cpp"
-   "src/precompiled.h"
-   "src/targetnode.h"
-   "src/task.h"
-   "src/settings.cpp"
-   "src/settings.h"
-   "src/matmakefile.cpp"
-   "src/defaultfile.cpp"
-   "src/defaultfile.h"
-   "src/parsematmakefile.cpp"
+   "src/test.cpp"
    "src/translateconfig.cpp"
-   "src/msvcenvironment.cpp"
-   "src/exampleproject.cpp"
 )
 
 add_subdirectory(lib/json.h)

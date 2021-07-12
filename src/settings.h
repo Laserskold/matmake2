@@ -11,6 +11,13 @@ enum class Command {
     List,
 };
 
+enum class Backend {
+    Default,
+    Native,
+    Makefile,
+    Ninja,
+};
+
 struct Settings {
     filesystem::path taskFile;
     bool printTree = false;
@@ -22,6 +29,7 @@ struct Settings {
     bool useMsvcEnvironment = false;
     std::string target = "";
     size_t numThreads = 0;
+    Backend backend = Backend::Default;
 
     Command command = Command::Build;
 

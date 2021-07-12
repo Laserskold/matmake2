@@ -32,7 +32,7 @@ struct TaskList {
         tasks.clear();
     }
 
-    Task *find(std::string name) {
+    Task *find(std::string name) const {
         if (name.empty()) {
             return nullptr;
         }
@@ -94,7 +94,7 @@ struct TaskList {
         return *_tasks.back();
     }
 
-    bool empty() {
+    bool empty() const {
         return _tasks.empty();
     }
 };

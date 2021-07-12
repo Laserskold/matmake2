@@ -50,17 +50,6 @@ const char *msvcSource = R"_(
   }
 )_";
 
-bool hasCommand(std::string command) {
-    if constexpr (getOs() == Os::Linux) {
-        return !system(("command -v " + command + " > /dev/null").c_str());
-    }
-    else {
-        throw std::runtime_error{std::string{__FILE__} + ":" +
-                                 std::to_string(__LINE__) +
-                                 " is not implemented "};
-    }
-} // namespace
-
 std::string getHighestClang() {
     if (getOs() == Os::Windows) {
         return "clang++.exe";
