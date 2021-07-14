@@ -105,6 +105,7 @@ int printNinja(const Settings &settings, const TaskList &tasks) {
 
         if (status) {
             std::cout << "failed...\n";
+            return status;
         }
         else {
             std::cout << "done...\n\n";
