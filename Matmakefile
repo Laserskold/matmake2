@@ -1,34 +1,41 @@
 # Matmake v2
 
-matmake2
-  out = matmake2
+core
+  out = core
   src =
     src/*.cpp
+    command = [static]
+
+matmake2
+  in = @core
+  out = matmake2
+  src =
     src/main/*.cpp
   command = [exe]
   ldflags = -pthread
 
 # --------------------------------
 
+
 # This will be simplified in the future
 task_test
+  in = @core
   out = task_test
   src =
-    src/*.cpp
     test/task_test.cpp
   command = [test]
 
 parse_matmakefile_test
+  in = @core
   out = parse_matmakefile_test
   src =
-    src/*.cpp
     test/parse_matmakefile_test.cpp
   command = [test]
 
 build_test
+  in = @core
   out = build_test
   src =
-    src/*.cpp
     test/build_test.cpp
   command = [test]
 
