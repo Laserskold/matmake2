@@ -77,7 +77,6 @@ int printMakefile(const Settings &settings, const TaskList &tasks) {
         throw std::runtime_error{"could not find target " + settings.target};
     }
 
-//        root->print(settings.verbose);
 
     createDirectories(tasks);
 
@@ -93,7 +92,7 @@ int printMakefile(const Settings &settings, const TaskList &tasks) {
 
         if (status) {
             std::cout << "failed...\n";
-            return status;
+            return 1;
         }
         else {
             std::cout << "done...\n\n";
