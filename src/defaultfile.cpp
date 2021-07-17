@@ -18,6 +18,7 @@ const char *gccSource = R"_(
       "cxx": "{c++} -x c++ {src} {modules} -o {out} -c {cxxflags} {flags} {includes}",
       "cc": "{c++} -x c {src} -o {out} -c {cxxflags} {flags} {includes}",
       "exe": "{c++} {in} -o {out} {ldflags} {flags} {includes}",
+      "so": "{c++} {in} -shared -o {out} {ldflags} {flags} {includes}",
       "gch": "{c++} {in} -o {out} {depfile} {cxxflags} {flags} {includes}",
       "eem": "{c++} {in} {standard} {includes} {eflags} -E > {out}",
       "pcm": "{c++} -c {cxxflags} {flags} {includes} {modules} -Xclang -emit-module-interface -x c++ {src} -o {out} ",

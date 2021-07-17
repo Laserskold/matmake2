@@ -17,6 +17,8 @@ enum class TranslatableString {
 
 std::string translateConfig(std::string config, FlagStyle);
 
+std::string commandSpecificConfig(std::string command, FlagStyle);
+
 std::string includePrefix(FlagStyle);
 
 std::string extension(std::string ext, FlagStyle);

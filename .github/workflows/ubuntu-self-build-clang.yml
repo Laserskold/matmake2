@@ -27,9 +27,13 @@ jobs:
     - name: create example project
       run: build/clang/matmake2 --init test
     - name: build example project
-      run: build/clang/matmake2 -C test --target gcc
+      run: build/clang/matmake2 -C test --target clang
     - name: Build demo project1
       run: build/clang/matmake2 -C build/clang/demos/project1 --target clang
+    - name: Build demo staticlib
+      run: build/clang/matmake2 -C build/clang/demos/staticlib --target clang
+    - name: Build demo dynamiclib
+      run: build/clang/matmake2 -C build/clang/demos/dynamiclib --target clang
     - name: Build demo module project
       run: build/clang/matmake2 -C build/clang/demos/modules --target clang
 

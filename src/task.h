@@ -568,6 +568,11 @@ public:
             ss << translateConfig(c, flagStyle) << " ";
         }
 
+        auto extraConfig = commandSpecificConfig(_command, flagStyle);
+        if (!extraConfig.empty()) {
+            ss << extraConfig << " ";
+        }
+
         auto str = ss.str();
         if (!str.empty() && isspace(str.back())) {
             str.pop_back();

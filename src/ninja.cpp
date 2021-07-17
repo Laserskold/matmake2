@@ -101,7 +101,8 @@ int printNinja(const Settings &settings, const TaskList &tasks) {
 
     if (!settings.skipBuild) {
         std::cout.flush();
-        auto status = system(("ninja -f " + dir.string()).c_str());
+        std::string verbosity = settings.verbose ? " --verbose " : "";
+        auto status = system(("ninja -f " + dir.string() + verbosity).c_str());
 
         if (status) {
             std::cout << "failed...\n";
