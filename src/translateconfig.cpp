@@ -7,11 +7,13 @@ const std::map<std::string, std::string> gccConfigs = {
     {"debug", "-g"},
     {"modules", "-fmodules-ts"},
     {"thread", "-pthread"},
+    {"PIC", "-fPIC"},
 };
 const std::map<std::string, std::string> msvcConfigs = {
     {"debug", "/DEBUG"},
     {"modules", "/std:latest"},
     {"thread", "/MD"}, // Use multithreaded standard library
+    {"PIC", ""},       // Not applicable in windows
 };
 
 const std::map<std::string, std::string> gccExtensions = {
@@ -171,4 +173,15 @@ std::string translateString(TranslatableString name, FlagStyle style) {
     }
 
     return {};
+}
+
+std::string commandSpecificConfig(std::string command, FlagStyle style) {
+    if (command.front() == '[' && command.back() == ']') {
+        command = command.substr(1, command.size() - 2);
+    }
+
+    if (command == "so") {
+        return translateConfig("PIC", style);
+    }
+    return "";
 }
