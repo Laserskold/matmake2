@@ -65,6 +65,10 @@ public:
         _name = std::move(value);
     }
 
+    void name(std::string_view name) {
+        _name = name;
+    }
+
     filesystem::path out() const {
         if (_out.empty()) {
             return {};

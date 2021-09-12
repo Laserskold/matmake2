@@ -29,7 +29,7 @@ TaskList createTasksFromMatmakefile(const Settings &settings) {
         }
     };
 
-    auto matmakeFile = MatmakeFile{getJson()};
+    auto matmakeFile = MatmakeFile{getJson(), settings.target};
 
     if (settings.debugPrint) {
         matmakeFile.print(std::cout);
@@ -175,7 +175,7 @@ int list(const Settings &settings) {
     auto matmakeFile = MatmakeFile{json};
 
     for (auto &node : matmakeFile.nodes()) {
-        if (auto p = node.property("command"); p && p->concat() == "[root]") {
+        if (node.isRoot()) {
             std::cout << node.name() << "\n";
         }
     }

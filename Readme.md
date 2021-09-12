@@ -42,17 +42,17 @@ main
     *.cppm
   out = main       # On windows ".exe" will be added to this name
   command = [exe]
+  em:ldflags       -s SDL=2    # use these flags for "em" target
+  !em:ldflags       -s SDL=2   # use these flags for all exept "em" target
   
 
 gcc
-  in = @main       # Specify that when building "gcc" main will be built
-  config =
+  config =         # add extra warnings to this specific compiler
     c++17
     modules
     Wall
     Wpedantic
     debug          # Compile with debug information
-  flagstyle = gcc  # gcc or msvc: how the flags look. Like "-Iinclude" or like "/Iinclude"
     
   
 

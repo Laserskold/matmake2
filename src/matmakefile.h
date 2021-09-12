@@ -6,34 +6,20 @@
 
 // Contains data loaded from json object
 class MatmakeNode {
-
     std::map<std::string, Property> _properties;
     std::string _name;
-
     std::map<std::string, std::string> _commands;
 
 public:
-    MatmakeNode(const Json &json) {
-        if (json.type != Json::Object) {
-            throw std::runtime_error{"Json: Wrong type when expected object " +
-                                     std::string{json.pos}};
-        }
+    MatmakeNode(const MatmakeNode &) = default;
+    MatmakeNode(MatmakeNode &&) = default;
+    MatmakeNode &operator=(const MatmakeNode &) = default;
+    MatmakeNode &operator=(MatmakeNode &&) = default;
 
-        for (auto &child : json) {
-            if (child.name == "name") {
-                _name = child.value;
-            }
+    MatmakeNode(const Json &json, std::string_view targetName);
 
-            if (child.name == "commands") {
-                for (auto &command : child) {
-                    _commands[command.name] = command.string();
-                }
-            }
-            else {
-                _properties[child.name] = Property{child};
-            }
-        }
-    }
+    // Merge nodes (used when two nodes has the same name)
+    bool merge(const MatmakeNode &other, std::string_view targetName);
 
     const Property *property(std::string name) const {
         if (auto f = _properties.find(name); f != _properties.end()) {
@@ -48,7 +34,7 @@ public:
         return _commands;
     }
 
-    const std::string &name() const {
+    std::string_view name() const {
         return _name;
     }
 
@@ -59,11 +45,20 @@ public:
                    << "\n";
         }
     }
+
+    bool isRoot() const {
+        constexpr auto rootStr = std::string_view{"root"};
+        if (auto f = property("root")) {
+            return f->values.size() == 1 && f->values.front() == rootStr;
+        }
+        return false;
+    }
 };
 
 class MatmakeFile {
 public:
-    MatmakeFile(const Json &json);
+    // @param json
+    MatmakeFile(const Json &json, std::string_view targetName = "");
 
     void print(std::ostream &stream = std::cout) {
         for (auto &child : _nodes) {

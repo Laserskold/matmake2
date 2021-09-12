@@ -27,9 +27,6 @@ struct Property {
         }
     }
 
-    std::vector<std::string> values;
-    Json::Position pos;
-
     std::string value() const {
         if (values.size() == 0) {
             throw std::runtime_error{"could not find value for property"};
@@ -74,4 +71,14 @@ struct Property {
 
         return stream;
     }
+
+    void append(const std::vector<std::string> &newValues) {
+        values.reserve(values.size() + newValues.size());
+        for (auto &v : newValues) {
+            values.push_back(v);
+        }
+    }
+
+    std::vector<std::string> values;
+    Json::Position pos;
 };
