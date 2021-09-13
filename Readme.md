@@ -43,7 +43,7 @@ main
   out = main       # On windows ".exe" will be added to this name
   command = [exe]
   em:ldflags       -s SDL=2    # use these flags for "em" target
-  !em:ldflags       -s SDL=2   # use these flags for all exept "em" target
+  !em:ldflags      -lSDL2      # use these flags for all exept "em" target
   
 
 gcc
