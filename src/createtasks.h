@@ -300,6 +300,11 @@ inline std::pair<TaskList, Task *> createTree(
             task.pushInclude(include);
         }
     }
+    if (auto p = root.property("sysincludes")) {
+        for (auto &include : p->values) {
+            task.pushSysInclude(include);
+        }
+    }
     if (auto p = root.property(("depprefix"))) {
         task.depfile(p->value());
     }

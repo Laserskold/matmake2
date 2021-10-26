@@ -288,10 +288,11 @@ public:
         return {};
     }
 
+    // Returns flag representation of both regular includes and system includes
     std::string includes() const {
         if (_parent) {
             auto parentIncludes = parent()->includes();
-            auto includeStr = concatIncludes();
+            auto includeStr = join(concatIncludes(), concatSysIncludes());
             if (parentIncludes.empty()) {
                 return includeStr;
             }
@@ -325,8 +326,32 @@ public:
         return str;
     }
 
+    std::string concatSysIncludes() const {
+        if (_sysIncludes.empty()) {
+            return {};
+        }
+        std::ostringstream ss;
+
+        auto includePrefix = ::sysIncludePrefix(flagStyle());
+
+        for (auto &i : _sysIncludes) {
+            ss << includePrefix << i << " ";
+        }
+
+        auto str = ss.str();
+
+        if (!str.empty() && str.back() == ' ') {
+            str.pop_back();
+        }
+        return str;
+    }
+
     void pushInclude(std::string includes) {
         _includes.push_back(includes);
+    }
+
+    void pushSysInclude(std::string includes) {
+        _sysIncludes.push_back(includes);
     }
 
     void depfile(filesystem::path path) {
@@ -788,6 +813,7 @@ private:
     std::string _eflags;
     std::string _depprefix;
     std::vector<std::string> _includes;
+    std::vector<std::string> _sysIncludes;
     std::vector<std::string> _config;
     FlagStyle _flagStyle = FlagStyle::Inherit;
     BuildLocation _buildLocation = BuildLocation::Real;

@@ -21,6 +21,8 @@ std::string commandSpecificConfig(std::string command, FlagStyle);
 
 std::string includePrefix(FlagStyle);
 
+std::string sysIncludePrefix(FlagStyle);
+
 std::string extension(std::string ext, FlagStyle);
 
 std::string extensionFromCommandType(std::string command, FlagStyle);
