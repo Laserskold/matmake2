@@ -93,6 +93,15 @@ std::string includePrefix(FlagStyle style) {
     }
 }
 
+std::string sysIncludePrefix(FlagStyle style) {
+    switch (style) {
+    case FlagStyle::Msvc:
+        return "/external:I";
+    default:
+        return "-isystem";
+    }
+}
+
 std::string extension(std::string ext, FlagStyle style) {
     if (ext.empty()) {
         return {};
