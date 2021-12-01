@@ -8,7 +8,7 @@ const std::map<std::string, std::string> gccConfigs = {
     {"modules", "-fmodules-ts"},
     {"thread", "-pthread"},
     {"PIC", "-fPIC"},
-    {"rpath-origin", "-Wl,-rpath=\'$$ORIGIN'"},
+    {"rpath-origin", "-Wl,-rpath,\'$$ORIGIN'"},
 };
 const std::map<std::string, std::string> msvcConfigs = {
     {"debug", "/DEBUG"},
